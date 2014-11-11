@@ -163,7 +163,7 @@ final class WPDocs {
 	private static function load_options() {
 
 		$defaults = array(
-			'custom_archive_page_id' => 41450
+			'custom_archive_page_id' => 42540
 		);
 
 		$options = get_option( 'wpdocs', array() );
