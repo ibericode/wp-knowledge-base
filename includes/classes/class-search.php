@@ -169,7 +169,7 @@ class Search {
 		if( class_exists( 'SearchWP' ) ) {
 
 			$engine = \SearchWP::instance();
-			$posts = $engine->search( 'wpdocs_search', $original_term . ' ' );
+			$posts = $engine->search( 'wpdocs_search', $original_term );
 
 			if( is_array( $posts ) ) {
 				return $posts;
