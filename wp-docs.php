@@ -1,8 +1,8 @@
 <?php
 /*
 Plugin Name: WP Docs
-Version: 1.0
-Plugin URI: https://wpdocs.com/
+Version: 1.0.1
+Plugin URI: https://mc4wp.com/kb/
 Description: WordPress powered documentation for your products. Beautiful.
 Author: Danny van Kooten
 Author URI: https://dannyvankooten.com/
@@ -36,17 +36,29 @@ if( ! defined( 'ABSPATH' ) ) {
 
 final class WPDocs {
 
+	/**
+	 * @const Slug of the post type
+	 */
 	const POST_TYPE_NAME = 'wpdocs-doc';
 
+	/**
+	 * @const Slug of category taxonomy
+	 */
 	const TAXONOMY_CATEGORY_NAME = 'wpdocs-category';
 
+	/**
+	 * @const Slug of keyword taxonomy
+	 */
 	const TAXONOMY_KEYWORD_NAME = 'wpdocs-keyword';
 
+	/**
+	 * @var array
+	 */
 	static $options = array();
 
 	public function __construct() {
 
-		define( 'WPDOCS_VERSION', '1.0' );
+		define( 'WPDOCS_VERSION', '1.0.1' );
 		define( 'WPDOCS_FILE', __FILE__ );
 
 		// add actions

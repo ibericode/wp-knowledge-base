@@ -52,7 +52,8 @@ class Search {
 	public function load_assets() {
 
 		$plugin_url = plugins_url( '/assets/', WPDOCS_FILE );
-		wp_register_script( 'wpdocs-search', $plugin_url . 'js/search.js', array( 'jquery' ), WPDOCS_VERSION, true );
+		$min = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+		wp_register_script( 'wpdocs-search', $plugin_url . 'js/search' . $min . '.js', array( 'jquery' ), WPDOCS_VERSION, true );
 
 		$data = array(
 			'ajaxurl' =>  admin_url( 'admin-ajax.php' )

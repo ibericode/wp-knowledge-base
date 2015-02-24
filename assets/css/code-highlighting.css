@@ -13,6 +13,7 @@ pre > code,
 	border: 1px solid #eee;
 	border-radius: 3px;
 	padding: 16px;
+	line-height: 16px;
 }
 
 .hljs {

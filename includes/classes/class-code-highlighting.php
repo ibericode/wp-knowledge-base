@@ -57,8 +57,9 @@ class Code_Highlighting {
 	public function load_assets() {
 
 		$plugin_url = plugins_url( '/assets/', WPDOCS_FILE );
+		$min = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 
-		wp_register_style( 'wpdocs-code-highlighting', $plugin_url . 'css/code-highlighting.css' );
+		wp_register_style( 'wpdocs-code-highlighting', $plugin_url . 'css/code-highlighting' . $min . '.css' );
 		wp_register_script( 'wpdocs-code-highlighting', '//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/highlight.min.js', array( ), false, true );
 
 		wp_enqueue_style( 'wpdocs-code-highlighting' );
