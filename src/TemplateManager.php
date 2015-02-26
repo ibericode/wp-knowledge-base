@@ -2,11 +2,7 @@
 
 namespace WPDocs;
 
-if( ! defined( 'WPDOCS_VERSION' ) ) {
-	exit;
-}
-
-class Template_Manager {
+class TemplateManager {
 
 	/**
 	 * @var object
@@ -146,7 +142,7 @@ class Template_Manager {
 		$content = '';
 
 		if( WPDocs::extension( 'breadcrumb' ) ) {
-			$content .= wpdocs_breadcrumb();
+			$content .= Breadcrumbs\Crumbs::instance()->build_html();
 			$this->relocate_breadcrumb();
 		}
 
@@ -196,7 +192,7 @@ class Template_Manager {
 		$content = '';
 
 		if( WPDocs::extension( 'breadcrumb' ) ) {
-			$content .= wpdocs_breadcrumb();
+			$content .= Breadcrumbs\Crumbs::instance()->build_html();
 			$this->relocate_breadcrumb();
 		}
 
@@ -232,7 +228,7 @@ class Template_Manager {
 
 		// add breadcrumb
 		if( WPDocs::extension( 'breadcrumb' ) ) {
-			$content = wpdocs_breadcrumb() . $content;
+			$content = Breadcrumbs\Crumbs::instance()->build_html() . $content;
 			$this->relocate_breadcrumb();
 		}
 
@@ -240,7 +236,7 @@ class Template_Manager {
 		$terms = wp_get_object_terms( $this->queried_object->ID, WPDocs::TAXONOMY_CATEGORY_NAME );
 		if( $terms && isset( $terms[0]->name ) ) {
 			$title = sprintf( __( 'Other articles in %s', 'wpdocs' ), $terms[0]->name );
-			$content .= '[wpdocs_list title="'. $title .'" category="'. $terms[0]->name .'"]';
+			$content .= '[wpdocs_list title="'. $title .'" category="'. $terms[0]->name .' exclude="'. $this->queried_object->ID .'"]';
 		}
 
 		return $content;
@@ -254,7 +250,7 @@ class Template_Manager {
 	}
 
 	/**
-	 * Prints the JS that relocated the breadcrumb element.
+	 * Prints the JS that relocates the breadcrumb element.
 	 */
 	public function relocate_breadcrumb_js() {
 		?><script type="text/javascript">

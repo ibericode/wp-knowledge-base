@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: WP Docs
-Version: 1.0.1
+Version: 1.0.2
 Plugin URI: https://mc4wp.com/kb/
 Description: WordPress powered documentation for your products. Beautiful.
 Author: Danny van Kooten
@@ -33,7 +33,6 @@ if( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-
 final class WPDocs {
 
 	/**
@@ -52,42 +51,48 @@ final class WPDocs {
 	const TAXONOMY_KEYWORD_NAME = 'wpdocs-keyword';
 
 	/**
+	 * Version of the plugin
+	 */
+	const VERSION = '1.0.2';
+
+
+	/**
+	 * Main plugin file
+	 */
+	const FILE = __FILE__;
+
+	/**
 	 * @var array
 	 */
 	static $options = array();
 
+	/**
+	 * Constructor
+	 */
 	public function __construct() {
 
-		define( 'WPDOCS_VERSION', '1.0.1' );
-		define( 'WPDOCS_FILE', __FILE__ );
+		require __DIR__ .'/vendor/autoload.php';
 
 		// add actions
 		add_action( 'init', array( $this, 'init' ) );
 
 		// register (de)activation hooks
-		register_activation_hook( WPDOCS_FILE, array( $this, 'on_plugin_activation' ) );
-		register_deactivation_hook( WPDOCS_FILE, array( $this, 'on_plugin_deactivation' ) );
+		register_activation_hook( self::FILE, array( $this, 'on_plugin_activation' ) );
+		register_deactivation_hook( self::FILE, array( $this, 'on_plugin_deactivation' ) );
 
-		// add filters
+		new Breadcrumbs\Manager();
 
 		// load template manager
-		require_once __DIR__ . '/includes/classes/class-template-manager.php';
-		new Template_Manager();
+		new TemplateManager();
 
 		// load search
-		require_once __DIR__ . '/includes/classes/class-search.php';
 		new Search();
 
 		// load code highlighter
-		require_once __DIR__ . '/includes/classes/class-code-highlighting.php';
-		new Code_Highlighting();
+		new CodeHighlighting();
 
 		// load lister (shortcodes)
-		require_once __DIR__ . '/includes/classes/class-doclist.php';
 		DocList::init();
-
-		require_once __DIR__ . '/includes/classes/class-breadcrumb.php';
-		require_once __DIR__ . '/includes/template-functions.php';
 	}
 
 	/**
@@ -194,8 +199,8 @@ final class WPDocs {
 	 * @return bool
 	 */
 	public static function extension( $slug ) {
-		$name = join( array_filter( explode( '-', strtolower( $slug ) ), 'ucfirst' ), '_' );
-		return class_exists( 'WPDocs\\' . $name , false );
+		$extensions = apply_filters( 'wpdocs_extensions', array() );
+		return( in_array( $slug, $extensions ) );
 	}
 
 }

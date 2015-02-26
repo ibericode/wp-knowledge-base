@@ -1,17 +1,32 @@
 <?php
 
-namespace WPDocs;
+namespace WPDocs\Breadcrumbs;
 
-if( ! defined( 'WPDOCS_VERSION' ) ) {
-	exit;
-}
+use WPDocs\WPDocs;
 
-class Breadcrumb {
+class Crumbs {
 
 	/**
 	 * @var array
 	 */
 	private $crumbs = array();
+
+	/**
+	 * @var Crumbs
+	 */
+	private static $instance;
+
+	/**
+	 * @return Crumbs
+	 */
+	public static function instance() {
+
+		if( ! self::$instance ) {
+			self::$instance = new self;
+		}
+
+		return self::$instance;
+	}
 
 	/**
 	 * Constructor
@@ -29,7 +44,7 @@ class Breadcrumb {
 	 * Adds a crumb to the breadcrumbs
 	 *
 	 * @param string $link
-	 * @param string $name
+	 * @param string $title
 	 */
 	private function add_crumb( $link, $title ) {
 		$this->crumbs[] = array(
@@ -160,19 +175,4 @@ class Breadcrumb {
 	}
 
 
-}
-
-/**
- * Returns a breadcrumb
- *
- * @return string
- */
-function wpdocs_breadcrumb() {
-	static $breadcrumb;
-
-	if( null === $breadcrumb ) {
-		$breadcrumb = new Breadcrumb();
-	}
-
-	return $breadcrumb->build_html();
 }

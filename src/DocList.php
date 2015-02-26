@@ -2,12 +2,6 @@
 
 namespace WPDocs;
 
-use Smalot\PdfParser\Page;
-
-if( ! defined( 'WPDOCS_VERSION' ) ) {
-	exit;
-}
-
 class DocList {
 
 	const SHORTCODE = 'wpdocs_list';
@@ -16,7 +10,8 @@ class DocList {
 		'category' => '',
 		'keyword' => '',
 		'title' => '',
-		'css_classes' => ''
+		'css_classes' => '',
+		'exclude' => ''
 	);
 
 	private $html = '';
@@ -33,7 +28,7 @@ class DocList {
 	 * @param array  $args
 	 * @param string $content
 	 *
-	 * @return DocBlock
+	 * @return DocList
 	 */
 	public static function shortcode( $args = array(), $content = '' ) {
 		return new DocList( $args );
@@ -51,9 +46,13 @@ class DocList {
 		$query_args = array(
 			'post_type' => WPDocs::POST_TYPE_NAME,
 			'postsperpage' => -1,
-			'post_status' => 'publish'
+			'post_status' => 'publish',
 		);
 
+		if( '' !== $args['exclude'] ) {
+			$exclude = explode( ',', $args['exclude'] );
+			$query_args['post__not_in'] = $exclude;
+		}
 
 		// start by assuming a title has been set
 		$title = $args['title'];

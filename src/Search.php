@@ -2,10 +2,6 @@
 
 namespace WPDocs;
 
-if( ! defined( 'WPDOCS_VERSION' ) ) {
-	exit;
-}
-
 class Search {
 
 	const SHORTCODE = 'wpdocs_search';
@@ -51,9 +47,9 @@ class Search {
 	 */
 	public function load_assets() {
 
-		$plugin_url = plugins_url( '/assets/', WPDOCS_FILE );
+		$plugin_url = plugins_url( '/assets/', WPDocs::FILE );
 		$min = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
-		wp_register_script( 'wpdocs-search', $plugin_url . 'js/search' . $min . '.js', array( 'jquery' ), WPDOCS_VERSION, true );
+		wp_register_script( 'wpdocs-search', $plugin_url . 'js/search' . $min . '.js', array( 'jquery' ), WPDocs::VERSION, true );
 
 		$data = array(
 			'ajaxurl' =>  admin_url( 'admin-ajax.php' )
