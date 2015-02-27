@@ -8,7 +8,6 @@
             "email": "dannyvankooten@gmail.com"
         }
     ],
-    "require": {},
     "require": {
         "php": ">=5.4.0"
     },
