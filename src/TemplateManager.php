@@ -236,7 +236,7 @@ class TemplateManager {
 		$terms = wp_get_object_terms( $this->queried_object->ID, WPDocs::TAXONOMY_CATEGORY_NAME );
 		if( $terms && isset( $terms[0]->name ) ) {
 			$title = sprintf( __( 'Other articles in %s', 'wpdocs' ), $terms[0]->name );
-			$content .= '[wpdocs_list title="'. $title .'" category="'. $terms[0]->name .' exclude="'. $this->queried_object->ID .'"]';
+			$content .= '[wpdocs_list title="'. $title .'" category="'. $terms[0]->slug .'" exclude="'. $this->queried_object->ID .'"]';
 		}
 
 		return $content;
