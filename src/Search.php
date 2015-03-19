@@ -162,58 +162,25 @@ class Search {
 	 */
 	public function search( $original_term ) {
 
-		// use SearchWP if possible
-		if( class_exists( 'SearchWP' ) ) {
-
-			$engine = \SearchWP::instance();
-			$posts = $engine->search( 'wpdocs_search', $original_term );
-
-			if( is_array( $posts ) ) {
-				return $posts;
-			}
-
-			return array();
-		}
+//		// use SearchWP if possible
+//		if( class_exists( 'SearchWP' ) ) {
+//
+//
+//			$engine = \SearchWP::instance();
+//			$posts = $engine->search( 'wpdocs_search', $original_term );
+//
+//			if( is_array( $posts ) ) {
+//				return $posts;
+//			}
+//
+//			return array();
+//		}
 
 		global $wpdb;
 
 		// go for an easy escape if the original term is very short
 		if( strlen( $original_term ) < 3 ) {
 			return array();
-		}
-
-		// perform more complicated search query
-		$search_terms = array();
-
-		// calculate number of spaces
-		$exploded_words = explode( ' ', $original_term );
-		$number_of_words = count( $exploded_words );
-
-		if( $number_of_words > 2 ) {
-
-			$tmp_term = '';
-			$i = 0;
-			foreach( $exploded_words as $word ) {
-
-				$tmp_term .= $word . ' ';
-				$i++;
-
-				// add every two words as a term
-				if( ( $i % 2 ) === 0 || $i === $number_of_words ) {
-
-					$tmp_term = trim( $tmp_term );
-
-					// if the word is short, don't add it
-					if( strlen( $tmp_term ) < 4 ) {
-						continue;
-					}
-
-					$search_terms[] = $tmp_term;
-					$tmp_term = '';
-				}
-			}
-		} else {
-			$search_terms[] = $original_term;
 		}
 
 		// start building SQL query string
@@ -234,29 +201,19 @@ class Search {
 
 		// query each search word in post title, post content, docs keyword and docs category
 		$string .= " AND (";
-		foreach( $search_terms as $term ) {
 
-			$string .= ' (';
+		// query title & content
+		$string .= " wpp.post_title LIKE %s OR wpp.post_content LIKE '%s'";
+		$params[] = '%%' . $original_term . '%%';
+		$params[] = '%%' . $original_term . '%%';
 
-			// query title & content
-			$string .= " wpp.post_title LIKE %s AND wpp.post_content LIKE %s";
-			$params[] = '%%' . $term . '%%';
-			$params[] = '%%' . $term . '%%';
+		// query keywords
+		$string .= " OR ( wptt.taxonomy = 'wpdocs-keyword' AND wpt.name LIKE '%s' )";
+		$params[] = '%%' . $original_term . '%%';
 
-			// query keywords
-			$string .= " OR ( wptt.taxonomy = 'wpdocs-keyword' AND wpt.name LIKE %s )";
-			$params[] = '%%' . $term . '%%';
-
-			// query category
-			$string .= " OR ( wptt.taxonomy = 'wpdocs-category' AND wpt.name LIKE %s )";
-			$params[] = '%%' . $term . '%%';
-
-
-			$string .= ' ) OR';
-		}
-
-		// strip last OR statement
-		$string = rtrim( $string, ' OR' );
+		// query category
+		$string .= " OR ( wptt.taxonomy = 'wpdocs-category' AND wpt.name LIKE '%s' )";
+		$params[] = '%%' . $original_term . '%%';
 
 		// close opened AND parenthesis
 		$string .= " )";
