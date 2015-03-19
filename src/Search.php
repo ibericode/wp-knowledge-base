@@ -162,19 +162,19 @@ class Search {
 	 */
 	public function search( $original_term ) {
 
-//		// use SearchWP if possible
-//		if( class_exists( 'SearchWP' ) ) {
-//
-//
-//			$engine = \SearchWP::instance();
-//			$posts = $engine->search( 'wpdocs_search', $original_term );
-//
-//			if( is_array( $posts ) ) {
-//				return $posts;
-//			}
-//
-//			return array();
-//		}
+
+		// use SearchWP if possible
+		if( class_exists( 'SearchWP' ) ) {
+			
+			$engine = \SearchWP::instance();
+			$posts = $engine->search( 'wpdocs_search', $original_term );
+
+			if( is_array( $posts ) ) {
+				return $posts;
+			}
+
+			return array();
+		}
 
 		global $wpdb;
 
