@@ -1,5 +1,5 @@
 {
-    "name": "dannyvankooten/wp-docs",
+    "name": "dannyvankooten/wp-knowledge-base",
     "description": "WordPress powered documentation.",
     "license": "GPL2",
     "authors": [
@@ -12,6 +12,6 @@
         "php": ">=5.4.0"
     },
     "autoload": {
-        "psr-4": {"WPDocs\\": "src/"}
+        "psr-4": {"WPKB\\": "src/"}
     }
 }

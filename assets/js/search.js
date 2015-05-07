@@ -1,4 +1,4 @@
-window.WPDocs = (function($) {
+window.WPKB_Search = (function($) {
 	'use strict';
 
 	/**
@@ -30,20 +30,20 @@ window.WPDocs = (function($) {
 	 */
 	var cache = {};
 
-	$('.wpdocs-search-term').keydown( function() {
+	$('.wpkb-search-term').keydown( function() {
 
 		window.clearTimeout( timer );
 
 		// save context for later use
-		var $context = $(this).parents('.wpdocs-search');
+		var $context = $(this).parents('.wpkb-search');
 
 		timer = window.setTimeout( function() {
 			getSearchResults( $context );
 		}, 300 );
 	});
 
-	$('.wpdocs-search-form').submit( function() {
-		var $context = $(this).parents('.wpdocs-search');
+	$('.wpkb-search-form').submit( function() {
+		var $context = $(this).parents('.wpkb-search');
 		getSearchResults( $context, true );
 		return false;
 	} );
@@ -54,8 +54,8 @@ window.WPDocs = (function($) {
 	function getSearchResults( $context, force ) {
 
 		var data = {
-			action: 'wpdocs_search',
-			search: $context.find('.wpdocs-search-term').val()
+			action: 'wpkb_search',
+			search: $context.find('.wpkb-search-term').val()
 		};
 
 		// Force query?
@@ -64,7 +64,7 @@ window.WPDocs = (function($) {
 
 			// If result is in cache object, use that
 			if( typeof( cache[ data.search ] ) !== "undefined" ) {
-				$context.find('.wpdocs-search-results').html( cache[ data.search ] );
+				$context.find('.wpkb-search-results').html( cache[ data.search ] );
 				return;
 			}
 
@@ -92,7 +92,7 @@ window.WPDocs = (function($) {
 		busy = true;
 
 		$.ajax({
-			url: wpdocs_vars.ajaxurl,
+			url: wpkb_search_vars.ajaxurl,
 			data: data,
 			complete: function() {
 				busy = false;
@@ -103,7 +103,7 @@ window.WPDocs = (function($) {
 					cache[data.search] = response.data;
 
 					// show response
-					$context.find('.wpdocs-search-results').html( response.data );
+					$context.find('.wpkb-search-results').html( response.data );
 				} else {
 					// something failed
 				}

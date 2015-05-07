@@ -1,6 +1,6 @@
 <?php
 
-namespace WPDocs;
+namespace WPKB;
 
 class TemplateManager {
 
@@ -14,32 +14,59 @@ class TemplateManager {
 	 */
 	private $templates = array( 'page.php', 'single.php', 'index.php' );
 
-	public function __construct() {
-		add_action( 'template_redirect', array( $this, 'choose_template' ) );
+	/**
+	 * @var Plugin
+	 */
+	protected $wpkb;
+
+	/**
+	 * @param Plugin $wpkb
+	 */
+	public function __construct( Plugin $wpkb ) {
+		$this->wpkb = $wpkb;
+	}
+
+	/**
+	 * @param        $template
+	 * @param string $content
+	 *
+	 * @return string
+	 */
+	protected function load_template( $template, $content = '' ) {
+		ob_start();
+		require __DIR__ . '/templates/' . $template . '.php';
+		$content = ob_get_contents();
+		ob_end_clean();
+		return $content;
+	}
+
+	/**
+	 * @param $content
+	 *
+	 * @return string
+	 */
+	public function load_article_template( $content ) {
+		return $this->load_template( 'article', $content );
 	}
 
 	/**
 	 * Decide which template file to load
 	 */
-	public function choose_template() {
+	public function override_templates() {
 
 		$this->queried_object = get_queried_object();
 
-		// choose post type archive template to load
-		// - custom page
-		// - custom archive template from theme
-		// - default wpdocs custom archive template
-		if( is_post_type_archive( WPDocs::POST_TYPE_NAME ) ) {
+		if( is_post_type_archive( Plugin::POST_TYPE_NAME ) ) {
 
 			// load template for a single page
-			$custom_archive_page_id = WPDocs::get_option( 'custom_archive_page_id' );
+			$custom_archive_page_id = $this->wpkb->get_option( 'custom_archive_page_id' );
 
 			if( $custom_archive_page_id > 0 ) {
 
 				// if we're using a custom archive page, that one should be used
 				$archive_link = get_permalink( $custom_archive_page_id );
 
-				if( $archive_link !== get_post_type_archive_link( WPDocs::POST_TYPE_NAME ) ) {
+				if( $archive_link !== get_post_type_archive_link( Plugin::POST_TYPE_NAME ) ) {
 					wp_redirect( $archive_link );
 					exit;
 				}
@@ -47,17 +74,17 @@ class TemplateManager {
 				add_filter( 'archive_template', array( $this, 'set_archive_template' ) );
 			}
 
-		} elseif( is_tax( WPDocs::TAXONOMY_CATEGORY_NAME ) ) {
+		} elseif( is_tax( Plugin::TAXONOMY_CATEGORY_NAME ) ) {
 
 			// choose "category" archive template to load
 			add_filter( 'taxonomy_template', array( $this, 'set_taxonomy_category_template' ) );
 
-		} elseif( is_tax( WPDocs::TAXONOMY_KEYWORD_NAME ) ) {
+		} elseif( is_tax( Plugin::TAXONOMY_KEYWORD_NAME ) ) {
 
 			// choose "keyword" archive template to load
 			add_filter( 'taxonomy_template', array( $this, 'set_taxonomy_keyword_template' ) );
 
-		} elseif( is_singular( WPDocs::POST_TYPE_NAME ) ) {
+		} elseif( is_singular( Plugin::POST_TYPE_NAME ) ) {
 
 			// choose template to load for singular docs
 			add_filter( 'single_template', array( $this, 'set_single_template' ) );
@@ -73,7 +100,7 @@ class TemplateManager {
 	public function set_archive_template( $template ) {
 
 		// if custom archive was set, use that one.
-		if( stristr( $template, 'archive-wpdocs-doc.php' ) !== false ) {
+		if( stristr( $template, 'archive-wpkb-article.php' ) !== false ) {
 			return $template;
 		}
 
@@ -90,7 +117,7 @@ class TemplateManager {
 	 */
 	public function default_archive_title( $title ) {
 		remove_filter( 'the_title', array( $this, 'default_archive_title' ) );
-		return __( 'Documentation', 'wpdocs' );
+		return __( 'Knowledge Base', 'wp-knowledge-base' );
 	}
 
 	/**
@@ -100,7 +127,7 @@ class TemplateManager {
 	 */
 	public function default_archive_content( $content ) {
 		remove_filter( 'the_content', array( $this, 'default_archive_content' ) );
-		return '[wpdocs_search][wpdocs_list]';
+		return $this->load_template( 'archive', $content );
 	}
 
 	/**
@@ -111,7 +138,7 @@ class TemplateManager {
 	public function set_taxonomy_category_template( $template ) {
 
 		// if custom archive was set, use that one.
-		if( stristr( $template, 'taxonomy-wpdocs-category.php' ) !== false ) {
+		if( stristr( $template, 'taxonomy-wpkb-category.php' ) !== false ) {
 			return $template;
 		}
 
@@ -122,7 +149,7 @@ class TemplateManager {
 	}
 
 	/**
-	 * @param $content
+	 * @param $title
 	 *
 	 * @return string
 	 */
@@ -138,19 +165,7 @@ class TemplateManager {
 	 */
 	public function default_taxonomy_category_content( $content ) {
 		remove_filter( 'the_content', array( $this, 'default_taxonomy_category_content' ) );
-
-		$content = '';
-
-		if( WPDocs::extension( 'breadcrumb' ) ) {
-			$content .= Breadcrumbs\Crumbs::instance()->build_html();
-			$this->relocate_breadcrumb();
-		}
-
-		$content .= term_description( );
-		$content .= '[wpdocs_list category="'. $this->queried_object->name .'"]';
-		$content .= '<h4>'. __( 'Search all categories', 'wpdocs' ) .'</h4>';
-		$content .= '[wpdocs_search]';
-		return $content;
+		return $this->load_template( 'category', $content );
 	}
 
 	/**
@@ -161,7 +176,7 @@ class TemplateManager {
 	public function set_taxonomy_keyword_template( $template ) {
 
 		// if custom archive was set, use that one.
-		if( stristr( $template, 'taxonomy-wpdocs-keyword.php' ) !== false ) {
+		if( stristr( $template, 'taxonomy-wpkb-keyword.php' ) !== false ) {
 			return $template;
 		}
 
@@ -189,17 +204,7 @@ class TemplateManager {
 	public function default_taxonomy_keyword_content( $content ) {
 		remove_filter( 'the_content', array( $this, 'default_taxonomy_keyword_content' ) );
 
-		$content = '';
-
-		if( WPDocs::extension( 'breadcrumb' ) ) {
-			$content .= Breadcrumbs\Crumbs::instance()->build_html();
-			$this->relocate_breadcrumb();
-		}
-
-		$content .= '[wpdocs_list keyword="'. $this->queried_object->name . '"]';
-		$content .= '<h4>'. __( 'Search all keywords', 'wpdocs' ) .'</h4>';
-		$content .= '[wpdocs_search]';
-		return $content;
+		return $this->load_template( 'keyword', $content );
 	}
 
 	/**
@@ -208,7 +213,7 @@ class TemplateManager {
 	public function set_single_template( $template ) {
 
 		// if custom archive was set, use that one.
-		if( stristr( $template, 'single-wpdocs-doc.php' ) !== false ) {
+		if( stristr( $template, 'single-wpkb-article.php' ) !== false ) {
 			return $template;
 		}
 
@@ -225,40 +230,7 @@ class TemplateManager {
 	 * @return string
 	 */
 	public function set_single_content( $content ) {
-
-		// add breadcrumb
-		if( WPDocs::extension( 'breadcrumb' ) ) {
-			$content = Breadcrumbs\Crumbs::instance()->build_html() . $content;
-			$this->relocate_breadcrumb();
-		}
-
-		// add block with related doc articles to end of article
-		$terms = wp_get_object_terms( $this->queried_object->ID, WPDocs::TAXONOMY_CATEGORY_NAME );
-		if( $terms && isset( $terms[0]->name ) ) {
-			$title = sprintf( __( 'Other articles in %s', 'wpdocs' ), $terms[0]->name );
-			$content .= '[wpdocs_list title="'. $title .'" category="'. $terms[0]->slug .'" exclude="'. $this->queried_object->ID .'"]';
-		}
-
-		return $content;
+		return $this->load_template( 'single', $content );
 	}
 
-	/**
-	 * Attach the action to relocate the breadcrumb
-	 */
-	private function relocate_breadcrumb() {
-		add_action( 'wp_footer', array( $this, 'relocate_breadcrumb_js' ), 90 );
-	}
-
-	/**
-	 * Prints the JS that relocates the breadcrumb element.
-	 */
-	public function relocate_breadcrumb_js() {
-		?><script type="text/javascript">
-			var breadcrumbElement = document.querySelector('.wpdocs-breadcrumb');
-			var postContainerElement = document.querySelector('.wpdocs-doc');
-			if( breadcrumbElement && postContainerElement && postContainerElement.firstChild ) {
-				postContainerElement.insertBefore( breadcrumbElement, postContainerElement.firstChild );
-			}
-		</script><?php
-	}
 }

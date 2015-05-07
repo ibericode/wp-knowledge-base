@@ -1,10 +1,15 @@
 <?php
 
-namespace WPDocs;
+namespace WPKB;
 
 class Search {
 
-	const SHORTCODE = 'wpdocs_search';
+	const SHORTCODE = 'wpkb_search';
+
+	/**
+	 * @var Plugin
+	 */
+	protected $plugin;
 
 	/**
 	 * @var bool
@@ -28,8 +33,14 @@ class Search {
 	 */
 	private $results = array();
 
-	public function __construct() {
+	/**
+	 * @param Plugin $plugin
+	 */
+	public function __construct( Plugin $plugin ) {
+		$this->plugin = $plugin;
+	}
 
+	public function add_hooks() {
 		// register shortcode
 		add_shortcode( self::SHORTCODE, array( $this, 'form' ) );
 
@@ -38,8 +49,8 @@ class Search {
 
 		// listen for requests
 		add_action( 'wp', array( $this, 'process_non_ajax_search' ) );
-		add_action( 'wp_ajax_wpdocs_search', array( $this, 'process_ajax_search') );
-		add_action( 'wp_ajax_nopriv_wpdocs_search', array( $this, 'process_ajax_search' ) );
+		add_action( 'wp_ajax_wpkb_search', array( $this, 'process_ajax_search') );
+		add_action( 'wp_ajax_nopriv_wpkb_search', array( $this, 'process_ajax_search' ) );
 	}
 
 	/**
@@ -47,14 +58,13 @@ class Search {
 	 */
 	public function load_assets() {
 
-		$plugin_url = plugins_url( '/assets/', WPDocs::FILE );
 		$min = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
-		wp_register_script( 'wpdocs-search', $plugin_url . 'js/search' . $min . '.js', array( 'jquery' ), WPDocs::VERSION, true );
+		wp_register_script( 'wpkb-search', $this->plugin->url( '/assets/js/search' . $min . '.js' ), array( 'jquery' ), $this->plugin->version(), true );
 
 		$data = array(
 			'ajaxurl' =>  admin_url( 'admin-ajax.php' )
 		);
-		wp_localize_script( 'wpdocs-search', 'wpdocs_vars', $data );
+		wp_localize_script( 'wpkb-search', 'wpkb_search_vars', $data );
 	}
 
 	/**
@@ -71,27 +81,27 @@ class Search {
 
 		$is_quick = ( $args['style'] === 'quick' );
 
-		wp_enqueue_script( 'wpdocs-search' );
+		wp_enqueue_script( 'wpkb-search' );
 
 		ob_start();
 		?>
-		<div class="wpdocs-search">
-		<form action="" method="get" class="wpdocs-search-form">
+		<div class="wpkb-search">
+		<form action="" method="get" class="wpkb-search-form">
 			<p>
-				<span class="wpdocs-search-input">
-					<input type="text" name="wpdocs-search" class="wpdocs-search-term" placeholder="<?php esc_attr_e( ( $is_quick ) ? 'Quick Search' : 'What are you looking for?', 'wpdocs' ); ?>" required />
+				<span class="wpkb-search-input">
+					<input type="text" name="wpkb-search" class="wpkb-search-term" placeholder="<?php esc_attr_e( ( $is_quick ) ? 'Quick Search' : 'What are you looking for?', 'wp-knowledge-base' ); ?>" required />
 				</span>
-				<span class="wpdocs-search-button" style="<?php echo ( $is_quick ) ? 'display: none;' : ''; ?>">
-					<input type="submit" value="<?php esc_attr_e( 'Search', 'wp-docs' ); ?>" />
+				<span class="wpkb-search-button" style="<?php echo ( $is_quick ) ? 'display: none;' : ''; ?>">
+					<input type="submit" value="<?php esc_attr_e( 'Search', 'wp-knowledge-base' ); ?>" />
 				</span>
 			</p>
 		</form>
-		<div class="wpdocs-search-results">
+		<div class="wpkb-search-results">
 		<?php
 		if( $this->is_search ) {
 			echo $this->build_result_html( $this->term, $this->results );
 		} elseif( ! $is_quick )  {
-			echo '<em>' . __( 'Type your search query in the field above.', 'wp-docs' ) . '</em>';
+			echo '<em>' . __( 'Type your search query in the field above.', 'wp-knowledge-base' ) . '</em>';
 		}
 		// close search results div
 		?></div></div><?php
@@ -111,11 +121,11 @@ class Search {
 	 */
 	private function build_result_html( $term, array $results ) {
 
-		$html = '<strong>' . sprintf( __( 'Results for "%s"', 'wp-docs' ), $term ) . '</strong>';
+		$html = '<strong>' . sprintf( __( 'Results for "%s"', 'wp-knowledge-base' ), $term ) . '</strong>';
 		$html .= '<p>';
 
 		if( count( $results ) === 0 ) {
-			$html .= __( 'No Docs found.', 'wp-docs' );
+			$html .= __( 'No articles found.', 'wp-knowledge-base' );
 		} else {
 			foreach( $results as $post ) {
 				$html .= sprintf( '<a href="%s">%s</a><br />', get_permalink( $post->ID ), get_the_title( $post->ID ) );
@@ -144,11 +154,11 @@ class Search {
 	 */
 	public function process_non_ajax_search() {
 
-		if( ! isset( $_GET['wpdocs-search'] ) ) {
+		if( ! isset( $_GET['wpkb-search'] ) ) {
 			return;
 		}
 
-		$this->term = sanitize_text_field( $_GET['wpdocs-search'] );
+		$this->term = sanitize_text_field( $_GET['wpkb-search'] );
 		$this->results = $this->search( $this->term );
 		$this->is_search = true;
 	}
@@ -165,9 +175,9 @@ class Search {
 
 		// use SearchWP if possible
 		if( class_exists( 'SearchWP' ) ) {
-			
+
 			$engine = \SearchWP::instance();
-			$posts = $engine->search( 'wpdocs_search', $original_term );
+			$posts = $engine->search( 'wpkb_search', $original_term );
 
 			if( is_array( $posts ) ) {
 				return $posts;
@@ -194,7 +204,7 @@ class Search {
 		$string .= " LEFT JOIN {$wpdb->terms} wpt ON wpt.term_id = wptt.term_id";
 
 		// only query post type doc
-		$string .= " WHERE wpp.post_type = 'wpdocs-doc'";
+		$string .= " WHERE wpp.post_type = 'wpkb-article'";
 
 		// only query published docs
 		$string .= " AND wpp.post_status = 'publish'";
@@ -208,11 +218,11 @@ class Search {
 		$params[] = '%%' . $original_term . '%%';
 
 		// query keywords
-		$string .= " OR ( wptt.taxonomy = 'wpdocs-keyword' AND wpt.name LIKE '%s' )";
+		$string .= " OR ( wptt.taxonomy = 'wpkb-keyword' AND wpt.name LIKE '%s' )";
 		$params[] = '%%' . $original_term . '%%';
 
 		// query category
-		$string .= " OR ( wptt.taxonomy = 'wpdocs-category' AND wpt.name LIKE '%s' )";
+		$string .= " OR ( wptt.taxonomy = 'wpkb-category' AND wpt.name LIKE '%s' )";
 		$params[] = '%%' . $original_term . '%%';
 
 		// close opened AND parenthesis
@@ -235,7 +245,7 @@ class Search {
 
 		$posts = get_posts(
 			array(
-				'post_type' => WPDocs::POST_TYPE_NAME,
+				'post_type' => Plugin::POST_TYPE_NAME,
 				'post__in' => $ids
 			)
 		);

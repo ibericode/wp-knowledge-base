@@ -1,11 +1,17 @@
 <?php
 
-namespace WPDocs;
+namespace WPKB;
 
-class DocList {
+class ArticleList {
 
-	const SHORTCODE = 'wpdocs_list';
+	/**
+	 * @const string
+	 */
+	const SHORTCODE = 'wpkb_list';
 
+	/**
+	 * @var array
+	 */
 	private $defaults = array(
 		'category' => '',
 		'keyword' => '',
@@ -14,12 +20,15 @@ class DocList {
 		'exclude' => ''
 	);
 
+	/**
+	 * @var string
+	 */
 	private $html = '';
 
 	/**
 	 * Initialize the shortcode
 	 */
-	public static function init() {
+	public static function register_shortcode() {
 		// register shortcode
 		add_shortcode( self::SHORTCODE, array( __CLASS__, 'shortcode' ) );
 	}
@@ -28,10 +37,10 @@ class DocList {
 	 * @param array  $args
 	 * @param string $content
 	 *
-	 * @return DocList
+	 * @return ArticleList
 	 */
 	public static function shortcode( $args = array(), $content = '' ) {
-		return new DocList( $args );
+		return new ArticleList( $args );
 	}
 
 	/**
@@ -44,8 +53,8 @@ class DocList {
 		$args = shortcode_atts( $this->defaults, $args, self::SHORTCODE );
 
 		$query_args = array(
-			'post_type' => WPDocs::POST_TYPE_NAME,
-			'postsperpage' => -1,
+			'post_type' => Plugin::POST_TYPE_NAME,
+			'posts_per_page' => -1,
 			'post_status' => 'publish',
 		);
 
@@ -64,29 +73,30 @@ class DocList {
 		if( '' !== $args['category'] ) {
 
 			// add to query arguments
-			$query_args[ WPDocs::TAXONOMY_CATEGORY_NAME ] = $args['category'];
+			$query_args[ Plugin::TAXONOMY_CATEGORY_NAME ] = $args['category'];
 
 			// if no title has been set, use the term name
 			if( '' === $title ) {
-				$term = get_term_by( 'name', $args['category'], WPDocs::TAXONOMY_CATEGORY_NAME );
+				$term = get_term_by( 'name', $args['category'], Plugin::TAXONOMY_CATEGORY_NAME );
+
 				if( is_object( $term ) ) {
 					$title = $term->name;
 				}
 			}
 
 			// add useful css class
-			$css_classes .= ' wpdocs-list-category-' . $args['category'];
+			$css_classes .= ' wpkb-list-category-' . $args['category'];
 		}
 
 		// query by keyword?
 		if( '' !== $args['keyword'] ) {
 
 			// add to query arguments
-			$query_args[ WPDocs::TAXONOMY_KEYWORD_NAME ] = $args['keyword'];
+			$query_args[ Plugin::TAXONOMY_KEYWORD_NAME ] = $args['keyword'];
 
 			// if no title has been set, use the term name
 			if( '' === $title ) {
-				$term = get_term_by( 'name', $args['keyword'], WPDocs::TAXONOMY_KEYWORD_NAME );
+				$term = get_term_by( 'name', $args['keyword'], Plugin::TAXONOMY_KEYWORD_NAME );
 
 				// if no title has been set, use the term name
 				if( is_object( $term ) ) {
@@ -95,17 +105,17 @@ class DocList {
 			}
 
 			// add useful css class
-			$css_classes .= ' wpdocs-list-keyword-' . $args['keyword'];
+			$css_classes .= ' wpkb-list-keyword-' . $args['keyword'];
 		}
 
 		// start building output string
-		$output = '<div class="wpdocs-list ' . esc_attr( ltrim( $css_classes ) ) . '">';
-		$output .= '<h3 class="wpdocs-list-title">' . esc_html( $title ) . '</h3>';
+		$output = '<div class="wpkb-list ' . esc_attr( ltrim( $css_classes ) ) . '">';
+		$output .= '<h3 class="wpkb-list-title">' . esc_html( $title ) . '</h3>';
 
 		// query docs
 		$docs = new \WP_Query( $query_args );
 
-		$output .= '<div class="wpdocs-list-content">';
+		$output .= '<div class="wpkb-list-content">';
 
 		if( $docs->have_posts() ) {
 
@@ -115,14 +125,14 @@ class DocList {
 				$docs->the_post();
 
 				// build string of css classes for this list element
-				$css_classes = 'wpdocs-doc-' . get_the_ID();
+				$css_classes = 'wpkb-article-' . get_the_ID();
 
-				$css_classes .= ( $docs->current_post % 2 ) ? ' wpdocs-odd' : ' wpdocs-even';
+				$css_classes .= ( $docs->current_post % 2 ) ? ' wpkb-odd' : ' wpkb-even';
 
 				if( $docs->current_post === 1 ) {
-					$css_classes .= ' wpdocs-doc-first';
+					$css_classes .= ' wpkb-first';
 				} elseif( $docs->current_post + 1 === $docs->post_count ) {
-					$css_classes .= ' wpdocs-doc-last';
+					$css_classes .= ' wpkb-last';
 				}
 
 				$output .= '<li class="' . $css_classes . '"><a href="'. get_permalink() .'">' . get_the_title() . '</a></li>';
@@ -130,7 +140,7 @@ class DocList {
 
 			$output .= '</ul>';
 		} else {
-			$output .= '<p>' . __( 'No documentation articles.', 'wpdocs' ) . '</p>';
+			$output .= '<p>' . __( 'No documentation articles.', 'wp-knowledge-base' ) . '</p>';
 		}
 
 		wp_reset_postdata();

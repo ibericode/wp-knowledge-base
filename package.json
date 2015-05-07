@@ -1,10 +1,10 @@
 {
-	"name" : "wp-docs",
-	"title" : "WordPress Docs",
+	"name" : "wp-knowledge-base",
+	"title" : "WP Knowledge Base",
 	"repository" :
 	{
 		"type" : "git",
-		"url" : "https://github.com/dannyvankooten/wp-docs"
+		"url" : "https://github.com/dannyvankooten/wp-knowledge-base"
 	},
 	"devDependencies": {
 		"grunt": "0.4.5",

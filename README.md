@@ -1,7 +1,7 @@
-WordPress Docs
+WP Knowledge Base
 =======
 
-WordPress powered documentation for your products. Beautiful.
+WordPress powered knowledge base for your products. Beautiful.
 
 **Requires PHP 5.3+**
 

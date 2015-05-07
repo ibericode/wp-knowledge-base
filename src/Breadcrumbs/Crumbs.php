@@ -1,8 +1,8 @@
 <?php
 
-namespace WPDocs\Breadcrumbs;
+namespace WPKB\Breadcrumbs;
 
-use WPDocs\WPDocs;
+use WPKB\Plugin;
 
 class Crumbs {
 
@@ -12,32 +12,16 @@ class Crumbs {
 	private $crumbs = array();
 
 	/**
-	 * @var Crumbs
+	 * @var int
 	 */
-	private static $instance;
-
-	/**
-	 * @return Crumbs
-	 */
-	public static function instance() {
-
-		if( ! self::$instance ) {
-			self::$instance = new self;
-		}
-
-		return self::$instance;
-	}
+	protected $base_page_id = 0;
 
 	/**
 	 * Constructor
+	 * @param int $base_page_id
 	 */
-	public function __construct() {
-
-		if( ! did_action( 'init' ) ) {
-			add_action( 'init', array( $this, 'build_crumbs' ) );
-		} else {
-			$this->build_crumbs();
-		}
+	public function __construct( $base_page_id = 0 ) {
+		$this->base_page_id = $base_page_id;
 	}
 
 	/**
@@ -59,7 +43,7 @@ class Crumbs {
 	 *
 	 * @return bool
 	 */
-	private function add_term_crumb( $term, $term_type = WPDocs::TAXONOMY_CATEGORY_NAME ) {
+	private function add_term_crumb( $term, $term_type = Plugin::TAXONOMY_CATEGORY_NAME ) {
 
 		// if term is not an object, query it.
 		if( ! is_object( $term ) && is_int( $term ) ) {
@@ -89,46 +73,53 @@ class Crumbs {
 		$object = get_queried_object();
 
 		// add base to crumb
-		$custom_archive_page_id = WPDocs::get_option( 'custom_archive_page_id' );
-		if( $custom_archive_page_id > 0 ) {
-			$this->add_crumb( get_permalink( $custom_archive_page_id ), get_the_title( $custom_archive_page_id ) );
+		if( $this->base_page_id > 0 ) {
+			$this->add_crumb( get_permalink( $this->base_page_id ), get_the_title( $this->base_page_id ) );
 		} else {
-			$this->add_crumb ( get_post_type_archive_link( WPDocs::POST_TYPE_NAME ), __( 'Docs', 'wpdocs' ) );
+			$this->add_crumb ( get_post_type_archive_link( Plugin::POST_TYPE_NAME ), __( 'Knowledge Base', 'wpdocs' ) );
 		}
 
 
-		if( is_singular( WPDocs::POST_TYPE_NAME ) ) {
+		if( is_singular( Plugin::POST_TYPE_NAME ) ) {
 
 			// add category
-			$categories = wp_get_object_terms( $object->ID, WPDocs::TAXONOMY_CATEGORY_NAME );
+			$categories = wp_get_object_terms( $object->ID, Plugin::TAXONOMY_CATEGORY_NAME );
 
 			if( is_array( $categories ) && isset( $categories[0] ) && is_object( $categories[0] ) ) {
-				$this->add_term_crumb( $categories[0], WPDocs::TAXONOMY_CATEGORY_NAME );
+				$this->add_term_crumb( $categories[0], Plugin::TAXONOMY_CATEGORY_NAME );
 			}
 
 			// add doc title
 			$this->add_crumb( get_permalink( $object ), get_the_title( $object ) );
 
-		} elseif( is_tax( WPDocs::TAXONOMY_CATEGORY_NAME ) ) {
+		} elseif( is_tax( Plugin::TAXONOMY_CATEGORY_NAME ) ) {
 
-			$this->add_term_crumb( $object, WPDOcs::TAXONOMY_CATEGORY_NAME );
+			$this->add_term_crumb( $object, Plugin::TAXONOMY_CATEGORY_NAME );
 
-		} elseif( is_tax( WPDOcs::TAXONOMY_KEYWORD_NAME ) ) {
+		} elseif( is_tax( Plugin::TAXONOMY_KEYWORD_NAME ) ) {
 
-			$this->add_term_crumb( $object, WPDOcs::TAXONOMY_KEYWORD_NAME );
+			$this->add_term_crumb( $object, Plugin::TAXONOMY_KEYWORD_NAME );
 
 		}
 	}
 
 	/**
 	 * Build the HTML string for the breadcrumbs
+	 *
+	 * @param string $opening_element
+	 * @param string $closing_element
+	 * @param string $separator
+	 * @param string $prefix
+	 *
+	 * @return string
 	 */
-	public function build_html( $opening_element = '<p class="breadcrumb wpdocs-breadcrumb">', $closing_element = '</p>', $separator = '&raquo;', $prefix = 'You are here:' ) {
+	public function build_html( $opening_element = '<p class="breadcrumb wpkb-breadcrumb">', $closing_element = '</p>', $separator = '&raquo;', $prefix = 'You are here:' ) {
 
-		$output = $opening_element;
+		$output = '<div id="wpkb-breadcrumbs">';
+		$output .= $opening_element;
 
 		if( '' !==  $prefix ) {
-			$output .= '<span class="wpdocs-breadcrumb-prefix">' . rtrim( $prefix, ' ' ) . '</span> ';
+			$output .= '<span class="wpkb-breadcrumb-prefix">' . rtrim( $prefix, ' ' ) . '</span> ';
 		}
 
 		$output .= '<span prefix="v: http://rdf.data-vocabulary.org/#">';
@@ -170,6 +161,7 @@ class Crumbs {
 
 		$output .= '</span>';
 		$output .= $closing_element;
+		$output .= '</div>';
 
 		return $output;
 	}

@@ -6,5 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'WPDocs\\' => array($baseDir . '/src'),
+    'WPKB\\' => array($baseDir . '/src'),
 );
