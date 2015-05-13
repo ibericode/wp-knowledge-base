@@ -115,7 +115,7 @@ window.WPKB_Search = (function($) {
 
 		// track event with google analytics
 		if( typeof( window.ga ) === "function" ) {
-			window.ga('send', 'pageview', '/kb/?wpkb-search=' + data.search);
+			window.ga('send', 'pageview', window.location.pathname + '?wpkb-search=' + data.search);
 		}
 	}
 
