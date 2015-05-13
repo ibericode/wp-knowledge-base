@@ -91,6 +91,8 @@ window.WPKB_Search = (function($) {
 		// set busy to true so no more shots will be fired
 		busy = true;
 
+
+
 		$.ajax({
 			url: wpkb_search_vars.ajaxurl,
 			data: data,
@@ -110,6 +112,11 @@ window.WPKB_Search = (function($) {
 			},
 			dataType: 'json'
 		});
+
+		// track event with google analytics
+		if( typeof( window.ga ) === "function" ) {
+			window.ga('send', 'pageview', '/kb/?wpkb-search=' + data.search);
+		}
 	}
 
 	return {}
