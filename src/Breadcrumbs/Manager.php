@@ -34,12 +34,21 @@ class Manager {
 	}
 
 	/**
+	 * Get the breadcrumb string
+	 *
+	 * @return string
+	 */
+	public function get() {
+		$crumbs = new Crumbs( $this->archive_page_id );
+		$crumbs->build_crumbs();
+		return $crumbs->build_html();
+	}
+
+	/**
 	 * Output the breadcrumb
 	 */
 	public function add_breadcrumb() {
-		$crumbs = new Crumbs( $this->archive_page_id );
-		$crumbs->build_crumbs();
-		echo $crumbs->build_html();
+		echo $this->get();
 		$this->relocate_crumbs();
 	}
 

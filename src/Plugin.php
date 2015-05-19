@@ -45,6 +45,11 @@ final class Plugin {
 	protected $post_type_slug = 'kb';
 
 	/**
+	 * @var Categories
+	 */
+	public $categories;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct( $version, $file, $dir ) {
@@ -57,6 +62,10 @@ final class Plugin {
 		}
 
 		$this->options = $this->load_options();
+
+		// init categories
+		$this->categories = new Categories( self::POST_TYPE_NAME, $this->post_type_slug );
+		$this->categories->add_hooks();
 	}
 
 	/**
@@ -93,18 +102,6 @@ final class Plugin {
 				'hierarchical' => false,
 			)
 		);
-
-		// register docs taxonomy: category
-		register_taxonomy(
-			self::TAXONOMY_CATEGORY_NAME,
-			self::POST_TYPE_NAME,
-			array(
-				'label' => __( 'Category' ),
-				'rewrite' => array( 'slug' => $this->post_type_slug . '/category' ),
-				'hierarchical' => true,
-				'query_var' => true
-			)
-		);
 	}
 
 	/**
@@ -119,7 +116,7 @@ final class Plugin {
 				'label'  => 'KB Articles',
 				'hierarchical' => true,
 				'rewrite' => array( 'slug' => $this->post_type_slug ),
-				'taxonomies' => array( self::TAXONOMY_CATEGORY_NAME, self::TAXONOMY_KEYWORD_NAME ),
+				'taxonomies' => array( $this->categories->taxonomy_name, self::TAXONOMY_KEYWORD_NAME ),
 				'has_archive' => ( Plugin::get_option( 'custom_archive_page_id' ) === 0 )
 			)
 		);
@@ -226,5 +223,13 @@ final class Plugin {
 	 */
 	public function url( $path = '' ) {
 		return plugins_url( $path, $this->file );
+	}
+
+	/**
+	 * @param $instance
+	 * @param $name
+	 */
+	public function attach( $instance, $variable_name ) {
+		$this->$variable_name = $instance;
 	}
 }

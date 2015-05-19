@@ -46,10 +46,12 @@ $wpkb->add_hooks();
 // load breadcrumbs
 $breadcrumbs = new Breadcrumbs\Manager( $wpkb->get_option('custom_archive_page_id') );
 $breadcrumbs->add_hooks();
+$wpkb->attach( $breadcrumbs, 'breadcrumbs' );
 
 // load search
 $search = new Search( $wpkb );
 $search->add_hooks();
+$wpkb->attach( $search, 'search' );
 
 // load code highlighter
 $highlighting = new CodeHighlighting( $wpkb );

@@ -75,7 +75,7 @@ class Search {
 	 *
 	 * @return string
 	 */
-	public function form( $args, $content = '' ) {
+	public function form( $args = array(), $content = '' ) {
 
 		$args = shortcode_atts( $this->defaults, $args, self::SHORTCODE );
 
@@ -86,7 +86,7 @@ class Search {
 		ob_start();
 		?>
 		<div class="wpkb-search">
-		<form action="" method="get" class="wpkb-search-form">
+		<form action="" method="get" class="wpkb-search-form <?php echo ( $is_quick ) ? 'wpkb-quick-search-form' : ''; ?>">
 			<p>
 				<span class="wpkb-search-input">
 					<input type="text" name="wpkb-search" class="wpkb-search-term" placeholder="<?php esc_attr_e( ( $is_quick ) ? 'Quick Search' : 'What are you looking for?', 'wp-knowledge-base' ); ?>" required />
