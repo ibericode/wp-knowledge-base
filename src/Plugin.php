@@ -66,6 +66,11 @@ final class Plugin {
 		// init categories
 		$this->categories = new Categories( self::POST_TYPE_NAME, $this->post_type_slug );
 		$this->categories->add_hooks();
+
+		if( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
+			$admin = new Admin();
+			$admin->add_hooks();
+		}
 	}
 
 	/**
@@ -100,6 +105,7 @@ final class Plugin {
 				'label' => __( 'Keyword', 'wp-knowledge-base' ),
 				'rewrite' => array( 'slug' => $this->post_type_slug . '/keyword' ),
 				'hierarchical' => false,
+				'query_var' => true
 			)
 		);
 	}
