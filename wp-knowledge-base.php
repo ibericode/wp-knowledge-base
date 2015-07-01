@@ -61,6 +61,16 @@ $highlighting->add_hooks();
 $callouts = new Callouts();
 $callouts->add_hooks();
 
+// rating
+$rating = new Rating\Rating();
+$rating->add_hooks();
+$wpkb->attach( $rating, 'rating' );
+
+if( is_admin() ) {
+	$rating_admin = new Rating\Admin();
+	$rating_admin->add_hooks();
+}
+
 // load template manager
 add_action( 'template_redirect', function() use ( $wpkb ) {
 	$template = new TemplateManager( $wpkb );
