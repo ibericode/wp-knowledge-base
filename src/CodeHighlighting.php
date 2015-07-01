@@ -54,7 +54,7 @@ class CodeHighlighting {
 		remove_filter( 'the_content', 'wpautop' );
 		remove_filter('the_content', 'wptexturize');
 		add_filter( 'the_content', 'wpautop' , 99);
-		add_filter( 'the_content', 'shortcode_unautop',100 );
+		add_filter( 'the_content', 'shortcode_unautop', 100 );
 
 		// register scripts and styles
 		add_action( 'wp_enqueue_scripts', array( $this, 'load_assets' ) );
