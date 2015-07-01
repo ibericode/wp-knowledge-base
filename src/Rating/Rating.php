@@ -114,7 +114,7 @@ class Rating {
 			)
 		);
 
-		$html = '<p class="wpkb-rating">' . sprintf( 'Was this article helpful? <a href="%s" class="wpkb-rating-option wpkb-rating-5">Yes</a> <a href="%s" class="wpkb-rating-option wpkb-rating-1">No</a>', $link . '&rating=5', $link . '&rating=1' ) . '</p>';
+		$html = '<p class="wpkb-rating">' . sprintf( 'Was this article helpful? <a href="%s" class="wpkb-rating-option wpkb-rating-5">Yes</a> &middot; <a href="%s" class="wpkb-rating-option wpkb-rating-1">No</a>', $link . '&rating=5', $link . '&rating=1' ) . '</p>';
 		return $content . PHP_EOL . $html;
 	}
 }
