@@ -57,6 +57,10 @@ $wpkb->attach( $search, 'search' );
 $highlighting = new CodeHighlighting( $wpkb );
 $highlighting->add_hooks();
 
+// load callouts
+$callouts = new Callouts();
+$callouts->add_hooks();
+
 // load template manager
 add_action( 'template_redirect', function() use ( $wpkb ) {
 	$template = new TemplateManager( $wpkb );
