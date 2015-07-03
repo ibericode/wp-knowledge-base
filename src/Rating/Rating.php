@@ -1,120 +1,57 @@
 <?php
-
 namespace WPKB\Rating;
 
 class Rating {
 
-	public function __construct() {
-
-	}
-
-	public function add_hooks() {
-		add_filter( 'the_content', array( $this, 'add_voting_options' ) );
-		add_action( 'init', array( $this, 'listen' ) );
-	}
+	/**
+	 * @var int
+	 */
+	public $rating = 1;
 
 	/**
-	 * @param $post_id
-	 *
-	 * @return int
+	 * @var string
 	 */
-	public function get_post_rating( $post_id ) {
-		return absint( get_post_meta( $post_id, 'wpkb_rating', true ) );
-	}
+	public $ip;
 
 	/**
-	 * @param $post_id
-	 *
-	 * @return int
+	 * @var int
 	 */
-	public function get_post_rating_count( $post_id ) {
-		return absint( get_post_meta( $post_id, 'wpkb_rating_count', true ) );
-	}
+	public $timestamp;
 
 	/**
-	 * @param $post_id
-	 *
-	 * @return int
+	 * @param      $rating
+	 * @param null $ip
+	 * @param null $timestamp
 	 */
-	public function get_post_rating_perc( $post_id ) {
-		return absint( get_post_meta( $post_id, 'wpkb_rating_perc', true ) );
-	}
+	public function __construct( $rating, $ip = null, $timestamp = null ) {
+		$this->rating = $rating;
+		$this->ip = $ip;
+		$this->timestamp = $timestamp;
 
-	/**
-	 * @return int
-	 */
-	public function calculate_post_rating_percentage( $rating, $count ) {
-
-		if( $count < 1 ) {
-			return 0;
+		if( $ip === null ) {
+			$this->ip = $this->get_client_ip();
 		}
 
-		return round( $rating / $count * 20 );
+		if( $timestamp === null ) {
+			$this->timestamp = time();
+		}
+
 	}
 
 	/**
-	 * @return bool
+	 * @return mixed
 	 */
-	public function listen() {
+	protected function get_client_ip() {
+		$headers = ( function_exists( 'apache_request_headers' ) ) ? apache_request_headers() : $_SERVER;
 
-		if( ! isset( $_GET['wpkb_action'] ) || $_GET['wpkb_action'] !== 'rate' ) {
-			return false;
-		}
-
-		$rating = ( isset( $_GET['rating'] ) ) ? absint( $_GET['rating'] ) : 0;
-		$post_id = ( isset( $_GET['id'] ) ) ? absint( $_GET['id'] ) : 0;
-
-		// rating must be given, post id must be given, rating must be between 1 and 5
-		if( ! $rating || ! $post_id || $rating < 1 || $rating > 5) {
-			return false;
-		}
-
-		$post_rating = $this->get_post_rating( $post_id );
-		$post_rating_count = $this->get_post_rating_count( $post_id );
-
-		// increase rating & rating count (number of rates)
-		$post_rating = $post_rating + $rating;
-		$post_rating_count++;
-		$post_rating_perc = $this->calculate_post_rating_percentage( $post_rating, $post_rating_count );
-
-		update_post_meta( $post_id, 'wpkb_rating', $post_rating );
-		update_post_meta( $post_id, 'wpkb_rating_count', $post_rating_count );
-		update_post_meta( $post_id, 'wpkb_rating_perc', $post_rating_perc );
-
-		// clean output buffer so we can redirect
-		if( ob_get_level() > 0 ) {
-			ob_clean();
-		}
-
-		// respond
-		if( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-
+		if ( array_key_exists( 'X-Forwarded-For', $headers ) && filter_var( $headers['X-Forwarded-For'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+			$ip = $headers['X-Forwarded-For'];
+		} elseif ( array_key_exists( 'HTTP_X_FORWARDED_FOR', $headers ) && filter_var( $headers['HTTP_X_FORWARDED_FOR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+			$ip = $headers['HTTP_X_FORWARDED_FOR'];
 		} else {
-			wp_safe_redirect( remove_query_arg( array( 'wpkb_action', 'id', 'rating' ) ) );
-			exit;
+			$ip = filter_var( $_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 );
 		}
 
-		return true;
-	}
-
-	/**
-	 * @param $content
-	 *
-	 * @return string
-	 */
-	public function add_voting_options( $content ) {
-
-		if( ! is_singular( 'wpkb-article') ) {
-			return $content;
-		}
-
-		$link = add_query_arg( array(
-				'wpkb_action' => 'rate',
-				'id' => get_the_ID(),
-			)
-		);
-
-		$html = '<p class="wpkb-rating">' . sprintf( 'Was this article helpful? <a href="%s" class="wpkb-rating-option wpkb-rating-5">Yes</a> &middot; <a href="%s" class="wpkb-rating-option wpkb-rating-1">No</a>', $link . '&rating=5', $link . '&rating=1' ) . '</p>';
-		return $content . PHP_EOL . $html;
+		return $ip;
 	}
 }

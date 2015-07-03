@@ -6,4 +6,18 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'WPKB\\Admin' => $baseDir . '/src/Admin.php',
+    'WPKB\\ArticleList' => $baseDir . '/src/ArticleList.php',
+    'WPKB\\Breadcrumbs\\Crumbs' => $baseDir . '/src/Breadcrumbs/Crumbs.php',
+    'WPKB\\Breadcrumbs\\Manager' => $baseDir . '/src/Breadcrumbs/Manager.php',
+    'WPKB\\Callouts' => $baseDir . '/src/Callouts.php',
+    'WPKB\\Categories' => $baseDir . '/src/Categories.php',
+    'WPKB\\CodeHighlighting' => $baseDir . '/src/CodeHighlighting.php',
+    'WPKB\\Plugin' => $baseDir . '/src/Plugin.php',
+    'WPKB\\Rating\\Admin' => $baseDir . '/src/Rating/Admin.php',
+    'WPKB\\Rating\\Collection' => $baseDir . '/src/Rating/Collection.php',
+    'WPKB\\Rating\\Rater' => $baseDir . '/src/Rating/Rater.php',
+    'WPKB\\Rating\\Rating' => $baseDir . '/src/Rating/Rating.php',
+    'WPKB\\Search' => $baseDir . '/src/Search.php',
+    'WPKB\\TemplateManager' => $baseDir . '/src/TemplateManager.php',
 );

@@ -62,7 +62,7 @@ $callouts = new Callouts();
 $callouts->add_hooks();
 
 // rating
-$rating = new Rating\Rating();
+$rating = new Rating\Rater();
 $rating->add_hooks();
 $wpkb->attach( $rating, 'rating' );
 
