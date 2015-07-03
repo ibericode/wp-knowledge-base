@@ -69,7 +69,7 @@ class Rater {
 
 		// calculate new percentage
 		$percentage = $ratings->average();
-		
+
 		update_post_meta( $post_id, 'wpkb_ratings', $ratings->toArray() );
 		update_post_meta( $post_id, 'wpkb_rating_perc', $percentage );
 

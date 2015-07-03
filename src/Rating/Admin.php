@@ -5,7 +5,7 @@ namespace WPKB\Rating;
 class Admin {
 
 	/**
-	 * @var Rating
+	 * @var Rater
 	 */
 	protected $rating;
 
@@ -13,11 +13,47 @@ class Admin {
 		global $wpkb;
 		$this->rating = $wpkb->rating;
 	}
+
 	public function add_hooks() {
 		add_filter( 'manage_wpkb-article_posts_columns', array( $this, 'column_header' ), 10);
 		add_filter( 'manage_edit-wpkb-article_sortable_columns', array( $this, 'sortable_columns' ) );
 		add_action( 'manage_wpkb-article_posts_custom_column', array( $this, 'column_content' ), 10, 2);
 		add_filter( 'pre_get_posts', array( $this, 'sortable_orderby' ) );
+		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
+	}
+
+	/**
+	 * Adds a box to the main column on the Post and Page edit screens.
+	 */
+	public function add_meta_box() {
+		add_meta_box(
+			'wpkb-ratings',
+			__( 'Article Ratings', 'wpkb-ratings' ),
+			array( $this, 'show_meta_box' ),
+			'wpkb-article'
+		);
+	}
+
+	/**
+	 * @param \WP_Post $post
+	 */
+	public function show_meta_box( $post ) {
+
+		$ratings = $this->rating->get_post_ratings( $post->ID );
+
+		if( count( $ratings ) === 0) {
+			echo 'No ratings for this article.';
+			return;
+		}
+
+		echo '<style type="text/css" scoped>.wpkb-ratings-table { border-collapse: collapse; } .wpkb-ratings-table th, .wpkb-ratings-table td{ border: 1px solid #eee; padding: 3px 6px; }</style>';
+		echo '<p>The following ratings were left for this article.</p>';
+		echo '<table class="wpkb-ratings-table" border="0">';
+		echo '<tr><th>Rating</th><th>IP address</th><th>Time</th></tr>';
+		foreach( $ratings as $rating ) {
+			printf( '<td>%d</td><td>%s</td><td>%s</td>', $rating->rating, $rating->ip, date( 'Y-m-d H:i', $rating->timestamp ) );
+		}
+		echo '</table>';
 	}
 
 	/**
