@@ -91,7 +91,7 @@ class Collection implements \Iterator, \Countable {
 		array_unshift( $this->elements, $rating );
 
 		// limit array to 20 elements
-		$this->elements = array_slice( $this->elements, -20 );
+		$this->elements = array_slice( $this->elements, 0, 20 );
 	}
 
 	/**
