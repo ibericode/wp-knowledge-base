@@ -51,7 +51,7 @@ class Admin {
 		echo '<table class="wpkb-ratings-table" border="0">';
 		echo '<tr><th>Rating</th><th>IP address</th><th>Time</th></tr>';
 		foreach( $ratings as $rating ) {
-			printf( '<td>%d</td><td>%s</td><td>%s</td>', $rating->rating, $rating->ip, date( 'Y-m-d H:i', $rating->timestamp ) );
+			printf( '<tr><td>%d</td><td>%s</td><td>%s</td></tr>', $rating->rating, $rating->ip, date( 'Y-m-d H:i', $rating->timestamp ) );
 		}
 		echo '</table>';
 	}
