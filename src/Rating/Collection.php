@@ -87,8 +87,8 @@ class Collection implements \Iterator, \Countable {
 			$this->remove( $existing );
 		}
 
-		// add to ratings
-		$this->elements[] = $rating;
+		// add to ratings (at start of array)
+		array_unshift( $this->elements, $rating );
 
 		// limit array to 20 elements
 		$this->elements = array_slice( $this->elements, -20 );
