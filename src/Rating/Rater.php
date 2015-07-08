@@ -82,7 +82,9 @@ class Rater {
 		if( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 
 		} else {
-			wp_safe_redirect( remove_query_arg( array( 'wpkb_action', 'id', 'rating' ) ) );
+			$url = remove_query_arg( array( 'wpkb_action', 'id', 'rating' ) );
+			$url = add_query_arg( array( 'wpkb-rated' => 1 ), $url );
+			wp_safe_redirect( $url );
 			exit;
 		}
 
@@ -100,13 +102,20 @@ class Rater {
 			return $content;
 		}
 
+		$html = '';
+
+		if( isset( $_GET['wpkb-rated'] ) ) {
+			$text = __( 'Thank you for your feedback!', 'wp-knowledge-base' );
+			$html .= '<div class="wpkb-alert info">'. $text .'</div>';
+		}
+
 		$link = add_query_arg( array(
 				'wpkb_action' => 'rate',
 				'id' => get_the_ID(),
 			)
 		);
 
-		$html = '<p class="wpkb-rating">' . sprintf( 'Was this article helpful? <a href="%s" class="wpkb-rating-option wpkb-rating-5">Yes</a> &middot; <a href="%s" class="wpkb-rating-option wpkb-rating-1">No</a>', $link . '&rating=5', $link . '&rating=1' ) . '</p>';
+		$html .= '<p class="wpkb-rating">' . sprintf( 'Was this article helpful? <a href="%s" class="wpkb-rating-option wpkb-rating-5">Yes</a> &middot; <a href="%s" class="wpkb-rating-option wpkb-rating-1">No</a>', $link . '&rating=5', $link . '&rating=1' ) . '</p>';
 		return $content . PHP_EOL . $html;
 	}
 }

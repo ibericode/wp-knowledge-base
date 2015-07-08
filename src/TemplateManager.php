@@ -88,6 +88,8 @@ class TemplateManager {
 
 			// choose template to load for singular docs
 			add_filter( 'single_template', array( $this, 'set_single_template' ) );
+			add_filter( 'wp_footer', array( $this, 'print_js_helpers' ) );
+			add_filter( 'wp_head', array( $this, 'print_css_helpers' ) );
 		}
 
 	}
@@ -231,6 +233,50 @@ class TemplateManager {
 	 */
 	public function set_single_content( $content ) {
 		return $this->load_template( 'single', $content );
+	}
+
+	/**
+	 * Print CSS helpers
+	 */
+	public function print_css_helpers() {
+		?>
+		<style type="text/css">
+			.wpkb-alert {
+				padding: 14px;
+				margin-bottom: 20px;
+				border: 1px solid transparent;
+			}
+			.wpkb-alert.success {
+				background-color: #dff0d8;
+				border-color: #d6e9c6;
+			}
+			.wpkb-alert.info {
+				background-color: #ecf7ff;
+				border-color: #80bfe2;
+			}
+			.wpkb-alert.warning {
+				background-color: #f2dede;
+				border-color: #ebccd1;
+			}
+		</style>
+		<?php
+	}
+
+	/**
+	 * Print JavaScript helpers
+	 */
+	public function print_js_helpers() {
+		?>
+		<script type="text/javascript">
+			(function() {
+				var alert = document.querySelector('.wpkb-alert');
+				if( alert ) {
+					var parent = document.querySelector('.wpkb-article');
+					parent.insertBefore( alert, parent.firstChild );
+				}
+			})();
+		</script>
+		<?php
 	}
 
 }

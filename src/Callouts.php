@@ -43,7 +43,7 @@ class Callouts {
 		<style type="text/css">
 			.wpkb-callout {
 				border-left: 5px solid #80bfe2;
-				padding: 20px 15px 10px 15px;
+				padding: 14px;
 			}
 			.wpkb-callout.success {
 				background: #e1f3c5;
