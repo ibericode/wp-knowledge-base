@@ -172,6 +172,7 @@ class Search {
 	 */
 	public function search( $original_term ) {
 
+		do_action( 'wpkb_search', $original_term );
 
 		// use SearchWP if possible
 		if( class_exists( 'SearchWP' ) ) {

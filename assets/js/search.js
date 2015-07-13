@@ -119,8 +119,13 @@ window.WPKB_Search = (function($) {
 		// track event with mixpanel
 		if( typeof( window.mixpanel ) === "object" ) {
 			window.mixpanel.track("KB Search", {
-				"query": data.search
+				"term": data.search
 			});
+		}
+
+		// track event with kissmetrics
+		if( typeof( window._kmq ) === "object" ) {
+			_kmq.push(['record', 'KB Search', { 'term': data.search }]);
 		}
 	}
 
