@@ -47,7 +47,7 @@ class Admin {
 		}
 
 		echo '<style type="text/css" scoped>.wpkb-ratings-table { border-collapse: collapse; } .wpkb-ratings-table th, .wpkb-ratings-table td{ border: 1px solid #eee; padding: 3px 6px; }</style>';
-		echo '<p>The following ratings were left for this article.</p>';
+		echo sprintf( '<p>The following %d ratings were left for this article.</p>', count( $ratings ) );
 		echo '<table class="wpkb-ratings-table" border="0">';
 		echo '<tr><th>Rating</th><th>IP address</th><th>Time</th></tr>';
 		foreach( $ratings as $rating ) {
@@ -112,7 +112,7 @@ class Admin {
 			return;
 		}
 		$color = $this->percent2Color( $rating, 200 );
-		echo sprintf( '<span style="color: #%s">%s%%</span>', $color, $rating );
+		echo sprintf( '<span style="color: #%s">%s%%</span> (%d)', $color, $rating, count( $this->rating->get_post_ratings( $post_id ) ) );
 	}
 
 	/**
