@@ -108,7 +108,7 @@ class Rater {
 		<form method="POST">
 			<h3>What should we do to improve this article?</h3>
 			<p><label for="message">Please explain in short why you did not find this article helpful. We would like to improve it based on your feedback!</label></p>
-			<p><textarea id="message" rows="10" cols="80" name="message" maxlength="255"></textarea></p>
+			<p><textarea id="message" rows="10" name="message" maxlength="255" style="width: 100%;"></textarea></p>
 			<p><input type="submit" class="button" value="Submit"></p>
 		</form>
 		<?php
