@@ -20,6 +20,39 @@ class Admin {
 		add_action( 'manage_wpkb-article_posts_custom_column', array( $this, 'column_content' ), 10, 2);
 		add_filter( 'pre_get_posts', array( $this, 'sortable_orderby' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
+		add_action( 'admin_init', array( $this, 'listen' ) );
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function listen() {
+
+		// make sure user is authorized to do the stuff we're about to do
+		if( ! current_user_can( 'delete_pages' ) ) {
+			return false;
+		}
+
+		if( empty( $_REQUEST['wpkb_action'] ) ) {
+			return false;
+		}
+
+		$action = $_REQUEST['wpkb_action'];
+
+		if( $action === 'delete_post_ratings' ) {
+			$post_id = (int) $_REQUEST['post_id'];
+			$this->delete_post_ratings( $post_id );
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param $post_id
+	 */
+	protected function delete_post_ratings( $post_id ) {
+		delete_post_meta( $post_id, 'wpkb_ratings' );
+		delete_post_meta( $post_id, 'wpkb_ratings_perc' );
 	}
 
 	/**
@@ -55,6 +88,10 @@ class Admin {
 			printf( '<tr><td>%d</td><td>%s</td><td><span title="%s">%s ago</span></td><td>%s</td></tr>', $rating->rating, $rating->ip, date( 'l, F j, Y \a\t H:i', $rating->timestamp ) ,human_time_diff( $rating->timestamp ), $rating->message );
 		}
 		echo '</table>';
+
+		// reset form
+		echo '<p>Use the following button to reset all ratings for this article.</p>';
+		echo '<form method="POST"><input type="hidden" name="wpkb_action" value="delete_post_ratings"><input type="hidden" name="post_id" value="' . get_the_ID() . '" /><input type="submit" class="button" onclick="return confirm(\'Are you sure you want to delete all ratings for this article?\');" value="Reset Ratings" /></form>';
 	}
 
 	/**
