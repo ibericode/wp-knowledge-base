@@ -46,7 +46,9 @@ class Rating {
 	}
 
 	/**
-	 * @return mixed
+	 * todo: this shouldn't be in this class
+	 *
+	 * @return string
 	 */
 	protected function get_client_ip() {
 		$headers = ( function_exists( 'apache_request_headers' ) ) ? apache_request_headers() : $_SERVER;

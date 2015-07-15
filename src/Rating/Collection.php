@@ -90,6 +90,11 @@ class Collection implements \Iterator, \Countable {
 		// add to ratings (at start of array)
 		array_unshift( $this->elements, $rating );
 
+		// sort ratings by timestamp
+		usort( $this->elements, function( $r1, $r2 ) {
+			return ( $r1->timestamp > $r2->timestamp ) ? -1 : 1;
+		});
+
 		// limit array to 20 elements
 		$this->elements = array_slice( $this->elements, 0, 20 );
 	}
