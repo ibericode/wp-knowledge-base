@@ -56,7 +56,7 @@ class Collection implements \Iterator, \Countable {
 				continue;
 			}
 
-			$rating = new Rating( $array['rating'], $array['ip'], $array['timestamp'] );
+			$rating = Rating::fromArray( $array );
 			$collection->add( $rating );
 		}
 

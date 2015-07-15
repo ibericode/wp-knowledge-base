@@ -19,12 +19,19 @@ class Rating {
 	public $timestamp;
 
 	/**
+	 * @var string
+	 */
+	public $message = '';
+
+	/**
 	 * @param      $rating
+	 * @param string $message
 	 * @param null $ip
 	 * @param null $timestamp
 	 */
-	public function __construct( $rating, $ip = null, $timestamp = null ) {
+	public function __construct( $rating, $message = '', $ip = null, $timestamp = null ) {
 		$this->rating = $rating;
+		$this->message = $message;
 		$this->ip = $ip;
 		$this->timestamp = $timestamp;
 
@@ -53,5 +60,24 @@ class Rating {
 		}
 
 		return $ip;
+	}
+
+	/**
+	 * @param $array
+	 *
+	 * @return Rating
+	 */
+	public static function fromArray( $array ) {
+		$object = new Rating( $array['rating'] );
+
+		// optional keys
+		$keys = array( 'message', 'ip', 'timestamp' );
+		foreach( $keys as $key ) {
+			if( ! empty( $array[ $key ] ) ) {
+				$object->{$key} = $array[ $key ];
+			}
+		}
+
+		return $object;
 	}
 }

@@ -49,9 +49,9 @@ class Admin {
 		echo '<style type="text/css" scoped>.wpkb-ratings-table { border-collapse: collapse; } .wpkb-ratings-table th, .wpkb-ratings-table td{ border: 1px solid #eee; padding: 3px 6px; }</style>';
 		echo sprintf( '<p>The following %d ratings were left for this article.</p>', count( $ratings ) );
 		echo '<table class="wpkb-ratings-table" border="0">';
-		echo '<tr><th>Rating</th><th>IP address</th><th>Time</th></tr>';
+		echo '<tr><th>Rating</th><th>IP address</th><th>Time</th><th>Message</th></tr>';
 		foreach( $ratings as $rating ) {
-			printf( '<tr><td>%d</td><td>%s</td><td>%s</td></tr>', $rating->rating, $rating->ip, date( 'Y-m-d H:i', $rating->timestamp ) );
+			printf( '<tr><td>%d</td><td>%s</td><td>%s</td><td>%s</td></tr>', $rating->rating, $rating->ip, date( 'Y-m-d H:i', $rating->timestamp ), $rating->message );
 		}
 		echo '</table>';
 	}

@@ -55,13 +55,14 @@ class Rater {
 
 		$rating_number = ( isset( $_GET['rating'] ) ) ? absint( $_GET['rating'] ) : 0;
 		$post_id = ( isset( $_GET['id'] ) ) ? absint( $_GET['id'] ) : 0;
+		$message = ( isset( $_REQUEST['message'] ) ) ? nl2br( sanitize_text_field( substr( $_REQUEST['message'], 0, 255 ) ) ) : '';
 
 		// rating must be given, post id must be given, rating must be between 1 and 5
 		if( ! $rating_number || ! $post_id || $rating_number < 1 || $rating_number > 5) {
 			return false;
 		}
 
-		$rating = new Rating( $rating_number );
+		$rating = new Rating( $rating_number, $message );
 		$ratings = $this->get_post_ratings( $post_id );
 
 		// add to array
@@ -82,6 +83,12 @@ class Rater {
 		if( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 
 		} else {
+
+			if( ! isset( $_REQUEST['message'] ) && $rating_number <= 2 ) {
+				// ask for further feedback
+				wp_die( $this->get_feedback_form(), 'Thanks for rating! - ' . get_bloginfo( 'name' ), 200 );
+			}
+
 			$url = remove_query_arg( array( 'wpkb_action', 'id', 'rating' ) );
 			$url = add_query_arg( array( 'wpkb-rated' => 1 ), $url );
 			wp_safe_redirect( $url );
@@ -89,6 +96,23 @@ class Rater {
 		}
 
 		return true;
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function get_feedback_form() {
+		ob_start();
+
+		?>
+		<form method="POST">
+			<h3>What should we do to improve this article?</h3>
+			<p><label for="message">Please explain in short why you did not find this article helpful. We would like to improve it based on your feedback!</label></p>
+			<p><textarea id="message" rows="10" cols="80" name="message" maxlength="255"></textarea></p>
+			<p><input type="submit" class="button" value="Submit"></p>
+		</form>
+		<?php
+		return ob_get_clean();
 	}
 
 	/**
