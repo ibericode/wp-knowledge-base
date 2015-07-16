@@ -44,6 +44,8 @@ class Admin {
 			$this->delete_post_ratings( $post_id );
 		}
 
+		wp_safe_redirect( remove_query_arg( 'wpkb_action' ) );
+
 		return true;
 	}
 
@@ -90,8 +92,13 @@ class Admin {
 		echo '</table>';
 
 		// reset form
+		$delete_link = add_query_arg( array(
+				'wpkb_action' => 'delete_post_ratings',
+				'post_id' => get_the_ID()
+			)
+		);
 		echo '<p>Use the following button to reset all ratings for this article.</p>';
-		echo '<form method="POST"><input type="hidden" name="wpkb_action" value="delete_post_ratings"><input type="hidden" name="post_id" value="' . get_the_ID() . '" /><input type="submit" class="button" onclick="return confirm(\'Are you sure you want to delete all ratings for this article?\');" value="Reset Ratings" /></form>';
+		echo '<p><a class="button" onclick="return confirm(\'Are you sure you want to delete all ratings for this article?\');" href="'. $delete_link .'">Reset Ratings</a></p>';
 	}
 
 	/**
