@@ -103,7 +103,7 @@ final class Plugin {
 			self::POST_TYPE_NAME,
 			array(
 				'label' => __( 'Keyword', 'wp-knowledge-base' ),
-				'rewrite' => array( 'slug' => $this->post_type_slug . '/keyword' ),
+				'rewrite' => array( 'with_front' => false, 'slug' => $this->post_type_slug . '/keyword' ),
 				'hierarchical' => false,
 				'query_var' => true
 			)
@@ -121,7 +121,7 @@ final class Plugin {
 				'public' => true,
 				'label'  => 'KB Articles',
 				'hierarchical' => true,
-				'rewrite' => array( 'slug' => $this->post_type_slug ),
+				'rewrite' => array( 'with_front' => false, 'slug' => $this->post_type_slug ),
 				'taxonomies' => array( $this->categories->taxonomy_name, self::TAXONOMY_KEYWORD_NAME ),
 				'has_archive' => ( Plugin::get_option( 'custom_archive_page_id' ) === 0 )
 			)
