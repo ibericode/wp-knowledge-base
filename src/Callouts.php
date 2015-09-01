@@ -58,6 +58,10 @@ class Callouts {
 				background: #fde8e8;
 				border-color: #e7aaaa;
 			}
+			.wpkb-callout a{
+				color: inherit;
+				text-decoration: underline;
+			}
 			.wpkb-callout > *:first-child {
 				margin-top: 0;
 			}
