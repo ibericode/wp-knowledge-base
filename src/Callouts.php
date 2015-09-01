@@ -2,6 +2,8 @@
 
 namespace WPKB;
 
+use WP_Screen;
+
 class Callouts {
 
 	const SHORTCODE = 'wpkb_callout';
@@ -17,7 +19,12 @@ class Callouts {
 	public function add_hooks() {
 		// register shortcode
 		add_shortcode( self::SHORTCODE, array( $this, 'shortcode' ) );
+
+		// print css for this in head
 		add_action( 'wp_head', array( $this, 'css' ) );
+
+		// add more buttons to the html editor
+		add_action( 'admin_print_footer_scripts', array( $this, 'add_quicktags' ) );
 	}
 
 	/**
@@ -82,6 +89,28 @@ class Callouts {
 		$atts = shortcode_atts( $this->default_atts, $atts, self::SHORTCODE );
 		$content = '<div class="wpkb-callout ' . $atts['type'] . '">' . trim( $content ) . '</div>';
 		return $content;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function add_quicktags() {
+		$screen = get_current_screen();
+
+		if( ! $screen instanceof WP_Screen || $screen->parent_base !== 'edit' || $screen->post_type !== Plugin::POST_TYPE_NAME ) {
+			return false;
+		}
+
+		// only print if quicktags is loaded
+		if( wp_script_is( 'quicktags' ) ) {
+			?>
+			<script type="text/javascript">
+				QTags.addButton( 'wpkb_callout', 'KB: Callout', '[wpkb_callout type="info"]', '[/wpkb_callout]', 'kbca', 'Callout', 100 );
+			</script>
+		<?php
+		}
+
+		return true;
 	}
 
 

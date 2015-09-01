@@ -2,6 +2,8 @@
 
 namespace WPKB;
 
+use WP_Screen;
+
 class CodeHighlighting {
 
 	/**
@@ -26,6 +28,9 @@ class CodeHighlighting {
 
 		// lazy add actions
 		add_action( 'template_redirect', array( $this, 'lazy_add' ) );
+
+		// add more buttons to the html editor
+		add_action( 'admin_print_footer_scripts', array( $this, 'add_quicktags' ) );
 	}
 
 	/**
@@ -109,6 +114,28 @@ class CodeHighlighting {
 			hljs.initHighlightingOnLoad();
 		</script>
 		<?php
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function add_quicktags() {
+		$screen = get_current_screen();
+
+		if( ! $screen instanceof WP_Screen || $screen->parent_base !== 'edit' || $screen->post_type !== Plugin::POST_TYPE_NAME ) {
+			return false;
+		}
+
+		// only print if quicktags is loaded
+		if( wp_script_is( 'quicktags' ) ) {
+			?>
+			<script type="text/javascript">
+				QTags.addButton( 'wpkb_code', 'KB: Code', '[wpkb_code]\n', '\n[/wpkb_code]', 'kbco', 'Code', 101 );
+			</script>
+		<?php
+		}
+
+		return true;
 	}
 
 
