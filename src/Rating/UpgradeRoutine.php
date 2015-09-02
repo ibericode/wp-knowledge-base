@@ -76,6 +76,10 @@ class UpgradeRoutine {
 						$args['timestamp'] =  gmdate( 'Y-m-d H:i:s', $array['timestamp'] + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ) );
 					}
 
+					if( ! empty( $array['message'] ) ) {
+						$args['message'] = $array['message'];
+					}
+
 					// create new rating object
 					$rating = new Rating( $result->post_id, $array['rating'], $args );
 					$this->rater->save_rating( $rating );
