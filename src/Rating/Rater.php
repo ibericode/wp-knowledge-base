@@ -2,53 +2,137 @@
 
 namespace WPKB\Rating;
 
+use WP_User;
+
 class Rater {
 
-	public function __construct() {
+	public function __construct() {}
 
-	}
-
+	/**
+	 * Add hooks
+	 */
 	public function add_hooks() {
 		add_filter( 'the_content', array( $this, 'add_voting_options' ) );
 		add_action( 'init', array( $this, 'listen' ) );
 	}
 
 	/**
-	 * @param $post_id
+	 * Create Rating from the current request
 	 *
-	 * @return Collection
+	 * @return Rating
 	 */
-	public function get_post_ratings( $post_id ) {
-		$ratings = (array) get_post_meta( $post_id, 'wpkb_ratings', true );
-		return Collection::fromArray( $ratings );
-	}
+	public function create_from_request() {
 
-	/**
-	 * @param $post_id
-	 *
-	 * @return int
-	 */
-	public function get_post_rating_perc( $post_id ) {
-		return absint( get_post_meta( $post_id, 'wpkb_rating_perc', true ) );
-	}
+		$rating_number = ( isset( $_GET['rating'] ) ) ? absint( $_GET['rating'] ) : 0;
+		$post_id = ( isset( $_GET['id'] ) ) ? absint( $_GET['id'] ) : 0;
+		$message = ( isset( $_REQUEST['message'] ) ) ? nl2br( sanitize_text_field( substr( $_REQUEST['message'], 0, 255 ) ) ) : '';
 
-	/**
-	 * @return int
-	 */
-	public function calculate_post_rating_percentage( $rating, $count ) {
-
-		if( $count < 1 ) {
-			return 0;
+		// rating must be given, post id must be given, rating must be between 1 and 5
+		if( ! $rating_number || ! $post_id || $rating_number < 1 || $rating_number > 5) {
+			return false;
 		}
 
-		return round( $rating / $count * 20 );
+		$args = array(
+			'message' => $message,
+			'author_IP' => $this->get_client_ip(),
+			'author_agent' => ( isset( $_SERVER['HTTP_USER_AGENT'] ) ) ? $_SERVER['HTTP_USER_AGENT'] : '',
+		);
+
+		$user = wp_get_current_user();
+		if( $user instanceof WP_User ) {
+			$args['author_name'] = $user->display_name;
+			$args['author_user_ID'] = $user->ID;
+			$args['author_email'] = $user->user_email;
+		}
+
+		$rating = new Rating( $post_id, $rating_number, $args );
+
+		return $rating;
+	}
+
+	/**
+	 * @param Rating $rating
+	 *
+	 * @return bool
+	 */
+	public function save_rating( Rating $rating ) {
+		// save rating
+		$id = wp_insert_comment( $rating->to_comment() );
+
+		if( $id ) {
+			$rating->comment_ID = $id;
+			add_comment_meta( $id, '_wpkb_rating', $rating->rating, true );
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param $post_id
+	 *
+	 * @return false|int
+	 */
+	public function delete_post_ratings( $post_id ) {
+		global $wpdb;
+		return $wpdb->delete( $wpdb->comments, array( 'comment_post_ID' => $post_id, 'comment_type' => '_wpkb_rating' ), array( '%d', '%s' ) );
+	}
+
+	/**
+	 * @return int
+	 */
+	public function get_number_of_ratings( $post_ID ) {
+		global $wpdb;
+		return $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->comments WHERE comment_post_ID = %d AND comment_type = %s", $post_ID, '_wpkb_rating' ) );
+	}
+
+	/**
+	 * @param $post_ID
+	 * @return int
+	 */
+	public function get_post_average( $post_ID ) {
+		global $wpdb;
+
+		$sql = "SELECT ( AVG(cm.meta_value) * 20 ) AS average_rating FROM $wpdb->comments c RIGHT JOIN $wpdb->commentmeta cm ON cm.comment_id = c.comment_ID WHERE cm.meta_key = '%s' AND c.comment_post_ID = %d";
+		$query = $wpdb->prepare( $sql, '_wpkb_rating', $post_ID );
+
+		$var = $wpdb->get_var( $query );
+		if( $var ) {
+			return round( $var );
+		}
+
+		return 0;
+	}
+
+	/**
+	 * @param $post_ID
+	 *
+	 * @return array
+	 */
+	public function get_post_ratings( $post_ID ) {
+		$comments = get_comments(
+			array(
+				'post_id' => $post_ID,
+				'type' => '_wpkb_rating',
+				'orderby' => 'comment_date',
+				'order' => 'DESC'
+			)
+		);
+		$ratings = array();
+
+		foreach( $comments as $comment ) {
+			$rating = Rating::from_comment( $comment );
+			$ratings[] = $rating;
+		}
+
+		return $ratings;
 	}
 
 	/**
 	 * @return bool
 	 */
 	protected function is_bot() {
-		
+
 		// make sure to block out bots
 		if( empty( $_SERVER['HTTP_USER_AGENT'] ) || preg_match( '/bot|crawl|slurp|spider/i', $_SERVER['HTTP_USER_AGENT'] ) ) {
 			return true;
@@ -94,26 +178,11 @@ class Rater {
 			return false;
 		}
 
-		$rating_number = ( isset( $_GET['rating'] ) ) ? absint( $_GET['rating'] ) : 0;
-		$post_id = ( isset( $_GET['id'] ) ) ? absint( $_GET['id'] ) : 0;
-		$message = ( isset( $_REQUEST['message'] ) ) ? nl2br( sanitize_text_field( substr( $_REQUEST['message'], 0, 255 ) ) ) : '';
-
-		// rating must be given, post id must be given, rating must be between 1 and 5
-		if( ! $rating_number || ! $post_id || $rating_number < 1 || $rating_number > 5) {
+		$rating = $this->create_from_request();
+		if( ! $rating instanceof Rating ) {
 			return false;
 		}
-
-		$rating = new Rating( $rating_number, $message, $this->get_client_ip() );
-		$ratings = $this->get_post_ratings( $post_id );
-
-		// add to array
-		$ratings->add( $rating );
-
-		// calculate new percentage
-		$percentage = $ratings->average();
-
-		update_post_meta( $post_id, 'wpkb_ratings', $ratings->toArray() );
-		update_post_meta( $post_id, 'wpkb_rating_perc', $percentage );
+		$this->save_rating( $rating );
 
 		// clean output buffer so we can redirect
 		if( ob_get_level() > 0 ) {
@@ -125,7 +194,7 @@ class Rater {
 
 		} else {
 
-			if( ! isset( $_REQUEST['message'] ) && $rating_number <= 2 ) {
+			if( ! isset( $_REQUEST['message'] ) && $rating->rating <= 2 ) {
 				// ask for further feedback
 				wp_die( $this->get_feedback_form(), 'Thanks for rating! - ' . get_bloginfo( 'name' ), 200 );
 			}

@@ -41,20 +41,12 @@ class Admin {
 
 		if( $action === 'delete_post_ratings' ) {
 			$post_id = (int) $_REQUEST['post_id'];
-			$this->delete_post_ratings( $post_id );
+			$this->rating->delete_post_ratings( $post_id );
 		}
 
 		wp_safe_redirect( remove_query_arg( 'wpkb_action' ) );
 
 		return true;
-	}
-
-	/**
-	 * @param $post_id
-	 */
-	protected function delete_post_ratings( $post_id ) {
-		delete_post_meta( $post_id, 'wpkb_ratings' );
-		delete_post_meta( $post_id, 'wpkb_ratings_perc' );
 	}
 
 	/**
@@ -87,7 +79,7 @@ class Admin {
 		echo '<table class="wpkb-ratings-table" border="0">';
 		echo '<tr><th>Rating</th><th>IP address</th><th>Time</th><th>Message</th></tr>';
 		foreach( $ratings as $rating ) {
-			printf( '<tr><td>%d</td><td>%s</td><td><span title="%s">%s ago</span></td><td>%s</td></tr>', $rating->rating, $rating->ip, date( 'l, F j, Y \a\t H:i', $rating->timestamp ) ,human_time_diff( $rating->timestamp ), $rating->message );
+			printf( '<tr><td>%d</td><td>%s</td><td><span title="%s">%s ago</span></td><td>%s</td></tr>', $rating->rating, $rating->author_IP, '', human_time_diff( strtotime( $rating->comment->comment_date_gmt ) ) , $rating->message );
 		}
 		echo '</table>';
 
@@ -151,13 +143,14 @@ class Admin {
 			return;
 		}
 
-		$rating = $this->rating->get_post_rating_perc( $post_id );
+
+		$rating = $this->rating->get_post_average( $post_id );
 		if( $rating === 0 ) {
 			echo '-';
 			return;
 		}
 		$color = $this->percent2Color( $rating, 200 );
-		echo sprintf( '<span style="color: #%s">%s%%</span> (%d)', $color, $rating, count( $this->rating->get_post_ratings( $post_id ) ) );
+		echo sprintf( '<span style="color: #%s">%s%%</span> (%d)', $color, $rating, $this->rating->get_number_of_ratings( $post_id ) );
 	}
 
 	/**
