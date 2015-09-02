@@ -13,6 +13,7 @@ class Admin {
 		global $wpkb;
 		$this->rating = $wpkb->rating;
 
+		// run upgrade routine?
 		$db_version = (int) get_option( 'wpkb_version', 0 );
 		if( version_compare( $db_version, WPKB_VERSION, '<' ) ) {
 			$routine = new UpgradeRoutine( $db_version, WPKB_VERSION, $this->rating );

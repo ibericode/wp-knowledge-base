@@ -167,6 +167,7 @@ class Rater {
 	/**
 	 * @param $post_ID
 	 * @param $rating
+	 * @return bool
 	 */
 	public function delete_author_post_ratings( $post_ID, $rating ) {
 		global $wpdb;
@@ -202,6 +203,9 @@ class Rater {
 
 		// save new rating
 		$this->save_rating( $rating );
+
+		// update average (for sortable columns);
+		update_post_meta( $rating->post_ID, 'wpkb_rating_perc', $this->get_post_average( $rating->post_ID ) );
 
 		// clean output buffer so we can redirect
 		if( ob_get_level() > 0 ) {
