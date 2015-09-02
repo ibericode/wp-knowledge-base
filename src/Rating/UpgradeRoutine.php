@@ -64,12 +64,15 @@ class UpgradeRoutine {
 					// skip faulty serialized arrays
 					if( empty( $array['rating'] ) ) { continue; }
 
-					// copy all array properties
-					$args = $array;
+					$args = array();
 
 					// rename `ip` property to `author_IP`
-					if( ! empty( $args['ip'] ) ) {
-						$args['author_IP'] = $args['ip'];
+					if( ! empty( $array['ip'] ) ) {
+						$args['author_IP'] = $array['ip'];
+					}
+
+					if( ! empty( $array['timestamp'] ) ) {
+						$args['timestamp'] = $array['timestamp'] + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
 					}
 
 					// create new rating object
