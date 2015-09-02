@@ -12,6 +12,13 @@ class Admin {
 	public function __construct() {
 		global $wpkb;
 		$this->rating = $wpkb->rating;
+
+		delete_option( 'wpkb_version' );
+		$db_version = (int) get_option( 'wpkb_version', 0 );
+		if( version_compare( $db_version, WPKB_VERSION, '<' ) ) {
+			$routine = new UpgradeRoutine( $db_version, WPKB_VERSION, $this->rating );
+			$routine->run();
+		}
 	}
 
 	public function add_hooks() {
