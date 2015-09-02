@@ -104,20 +104,13 @@ class Rater {
 		return 0;
 	}
 
-	/**
-	 * @param $post_ID
-	 *
-	 * @return array
-	 */
-	public function get_post_ratings( $post_ID ) {
-		$comments = get_comments(
-			array(
-				'post_id' => $post_ID,
-				'type' => '_wpkb_rating',
-				'orderby' => 'comment_date',
-				'order' => 'DESC'
-			)
-		);
+	public function get_ratings( $args = array() ) {
+		$args = array_merge( array(
+			'type' => '_wpkb_rating',
+			'orderby' => 'comment_date',
+			'order' => 'DESC'
+		), $args );
+		$comments = get_comments( $args );
 		$ratings = array();
 
 		foreach( $comments as $comment ) {
@@ -126,6 +119,15 @@ class Rater {
 		}
 
 		return $ratings;
+	}
+
+	/**
+	 * @param $post_ID
+	 *
+	 * @return array
+	 */
+	public function get_post_ratings( $post_ID ) {
+		return $this->get_ratings( array( 'post_id' => $post_ID ) );
 	}
 
 	/**

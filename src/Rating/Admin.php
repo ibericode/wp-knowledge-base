@@ -28,6 +28,49 @@ class Admin {
 		add_filter( 'pre_get_posts', array( $this, 'sortable_orderby' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 		add_action( 'admin_init', array( $this, 'listen' ) );
+		add_action( 'wp_dashboard_setup', array( $this, 'register_dashboard_widget' ) );
+
+		// hide ratings by default
+		add_filter( 'pre_get_comments', function( $query ) {
+			if( $query->query_vars['type'] === '_wpkb_rating' ) {
+				return $query;
+			}
+
+			// hide by default
+			$query->query_vars['type__not_in'][] = '_wpkb_rating';
+			return $query;
+		});
+	}
+
+	/**
+	 * Registers the dashboard widget
+	 */
+	public function register_dashboard_widget() {
+		wp_add_dashboard_widget(
+			'wpkb_recent_ratings',         // Widget slug.
+			'Recent KB Ratings',         // Title.
+			array( $this, 'dashboard_widget' ) // Display function.
+		);
+	}
+
+	/**
+	 * Dashboard widget showing the 5 most recent ratings
+	 */
+	public function dashboard_widget() {
+		$ratings = $this->rating->get_ratings( array( 'number' => 5 ) );
+
+		if( empty( $ratings ) ) {
+			echo '<p>No ratings.</p>';
+			return;
+		}
+
+		echo '<style type="text/css" scoped>.wpkb-ratings-table { border-collapse: collapse; } .wpkb-ratings-table th, .wpkb-ratings-table td{ text-align: left; border: 1px solid #eee; padding: 3px 6px; }</style>';
+		echo '<table class="wpkb-ratings-table" border="0">';
+		echo '<tr><th>Page</th><th>Rating</th><th>Time</th><th>Message</th></tr>';
+		foreach( $ratings as $rating ) {
+			printf( '<tr><td><a href="%s">%s</a></td><td>%d</td><td><span title="%s">%s ago</span></td><td>%s</td></tr>', get_edit_post_link( $rating->post_ID ), get_the_title( $rating->post_ID ), $rating->rating, '', human_time_diff( strtotime( $rating->comment->comment_date_gmt ) ) , $rating->message );
+		}
+		echo '</table>';
 	}
 
 	/**

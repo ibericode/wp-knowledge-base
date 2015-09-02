@@ -123,7 +123,8 @@ final class Plugin {
 				'hierarchical' => true,
 				'rewrite' => array( 'with_front' => false, 'slug' => $this->post_type_slug ),
 				'taxonomies' => array( $this->categories->taxonomy_name, self::TAXONOMY_KEYWORD_NAME ),
-				'has_archive' => ( Plugin::get_option( 'custom_archive_page_id' ) === 0 )
+				'has_archive' => ( Plugin::get_option( 'custom_archive_page_id' ) === 0 ),
+				//'supports' => array( 'comments' ) todo: finish migration to comments API & use that interface
 			)
 		);
 	}
