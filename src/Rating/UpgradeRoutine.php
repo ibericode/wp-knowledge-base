@@ -73,7 +73,7 @@ class UpgradeRoutine {
 
 					if( ! empty( $array['timestamp'] ) ) {
 						// new timestamp takes gmt offset into account
-						$args['timestamp'] = $array['timestamp'] + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+						$args['timestamp'] =  gmdate( 'Y-m-d H:i:s', $array['timestamp'] + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ) );
 					}
 
 					// create new rating object
