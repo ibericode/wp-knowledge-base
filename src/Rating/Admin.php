@@ -64,11 +64,12 @@ class Admin {
 			return;
 		}
 
+
 		echo '<style type="text/css" scoped>.wpkb-ratings-table { border-collapse: collapse; } .wpkb-ratings-table th, .wpkb-ratings-table td{ text-align: left; border: 1px solid #eee; padding: 3px 6px; }</style>';
 		echo '<table class="wpkb-ratings-table" border="0">';
 		echo '<tr><th>Page</th><th>Rating</th><th>Time</th><th>Message</th></tr>';
 		foreach( $ratings as $rating ) {
-			printf( '<tr><td><a href="%s">%s</a></td><td>%d</td><td><span title="%s">%s ago</span></td><td>%s</td></tr>', get_edit_post_link( $rating->post_ID ), get_the_title( $rating->post_ID ), $rating->rating, '', human_time_diff( strtotime( $rating->comment->comment_date_gmt ) ) , $rating->message );
+			printf( '<tr><td><a href="%s">%s</a></td><td>%d</td><td><span title="%s">%s ago</span></td><td>%s</td></tr>', get_edit_post_link( $rating->post_ID ), get_the_title( $rating->post_ID ), $rating->rating, '', human_time_diff( strtotime( $rating->comment->comment_date_gmt ) ), substr( $rating->message, 0, 20 ) . ( ( strlen( $rating->message ) > 20 ) ? '..' : '' ) );
 		}
 		echo '</table>';
 	}
