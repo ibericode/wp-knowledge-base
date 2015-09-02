@@ -72,6 +72,7 @@ class UpgradeRoutine {
 					}
 
 					if( ! empty( $array['timestamp'] ) ) {
+						// new timestamp takes gmt offset into account
 						$args['timestamp'] = $array['timestamp'] + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
 					}
 
