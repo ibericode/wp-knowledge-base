@@ -73,9 +73,9 @@ class Rater {
 	 *
 	 * @return false|int
 	 */
-	public function delete_post_ratings( $post_id ) {
+	public function delete_post_ratings( $post_ID ) {
 		global $wpdb;
-		return $wpdb->delete( $wpdb->comments, array( 'comment_post_ID' => $post_id, 'comment_type' => '_wpkb_rating' ), array( '%d', '%s' ) );
+		return $wpdb->delete( $wpdb->comments, array( 'comment_post_ID' => $post_ID, 'comment_type' => '_wpkb_rating' ), array( '%d', '%s' ) );
 	}
 
 	/**
@@ -165,6 +165,20 @@ class Rater {
 	}
 
 	/**
+	 * @param $post_ID
+	 * @param $rating
+	 */
+	public function delete_author_post_ratings( $post_ID, $rating ) {
+		global $wpdb;
+
+		if( ! empty( $rating->author_user_ID ) ) {
+			return $wpdb->delete( $wpdb->comments, array( 'comment_post_ID' => $post_ID, 'user_id' => $rating->author_user_ID, 'comment_type' => '_wpkb_rating' ), array( '%d', '%d', '%s' ) );
+		}
+
+		return $wpdb->delete( $wpdb->comments, array( 'comment_post_ID' => $post_ID, 'comment_author_IP' => $rating->author_IP, 'comment_type' => '_wpkb_rating' ), array( '%d', '%s', '%s' ) );
+	}
+
+	/**
 	 * @return bool
 	 */
 	public function listen() {
@@ -182,6 +196,11 @@ class Rater {
 		if( ! $rating instanceof Rating ) {
 			return false;
 		}
+
+		// delete previous ratings from this user / ip
+		$this->delete_author_post_ratings( $rating->post_ID, $rating );
+
+		// save new rating
 		$this->save_rating( $rating );
 
 		// clean output buffer so we can redirect
