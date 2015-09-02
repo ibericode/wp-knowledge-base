@@ -57,7 +57,7 @@ class Admin {
 	 * Dashboard widget showing the 5 most recent ratings
 	 */
 	public function dashboard_widget() {
-		$ratings = $this->rating->get_ratings( array( 'number' => 5 ) );
+		$ratings = $this->rating->get_ratings( array( 'number' => 10 ) );
 
 		if( empty( $ratings ) ) {
 			echo '<p>No ratings.</p>';
