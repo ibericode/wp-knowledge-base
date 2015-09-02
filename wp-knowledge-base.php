@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: WP Knowledge Base
-Version: 1.1
+Version: 1.2
 Plugin URI: https://mc4wp.com/kb/
 Description: WordPress powered documentation for your products. Beautiful.
 Author: Danny van Kooten
@@ -34,7 +34,7 @@ if( ! defined( 'ABSPATH' ) ) {
 }
 
 // define version
-define( 'WPKB_VERSION', '1.1' );
+define( 'WPKB_VERSION', '1.2' );
 
 // load composer autoloader
 require __DIR__ . '/vendor/autoload.php';
