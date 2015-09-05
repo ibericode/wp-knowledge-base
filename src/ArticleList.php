@@ -85,7 +85,7 @@ class ArticleList {
 			}
 
 			// add useful css class
-			$css_classes .= ' wpkb-list-category-' . $args['category'];
+			$css_classes .= 'wpkb-list-category-' . $args['category'];
 			// strip off accents (assuming utf8 PHP - note strtr() requires single-byte)
 			$css_classes = utf8_decode( $css_classes );
 			// convert to lower case
