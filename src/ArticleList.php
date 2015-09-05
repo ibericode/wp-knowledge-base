@@ -85,7 +85,18 @@ class ArticleList {
 			}
 
 			// add useful css class
-			$css_classes .= ' wpkb-list-category-' . $args['category'];
+			$css_classes .= 'wpkb-list-category-' . $args['category'];
+			// strip off accents (assuming utf8 PHP - note strtr() requires single-byte)
+			$css_classes = utf8_decode( $css_classes );
+			// convert to lower case
+			$css_classes = strtolower( $css_classes );
+			// strip all but alphanumeric, whitespace, dot, underscore, hyphen
+			$css_classes = preg_replace( "/[^a-z0-9\s._-]/", "", $css_classes );
+			// merge multiple consecutive whitespaces, dots, underscores, hyphens
+			$css_classes = preg_replace( "/[\s._-]+/", " ", $css_classes );
+			// convert whitespaces to hyphens
+			$css_classes = preg_replace( "/[\s]/", "-", $css_classes );
+
 		}
 
 		// query by keyword?
