@@ -60,11 +60,22 @@ class CodeHighlighting {
 		remove_filter('the_content', 'wptexturize');
 		add_filter( 'the_content', 'wpautop' , 99);
 		add_filter( 'the_content', 'shortcode_unautop', 100 );
+		add_filter( 'the_content', array( $this, 'encode_php_tags' ) );
 
 		// register scripts and styles
 		add_action( 'wp_enqueue_scripts', array( $this, 'load_assets' ) );
 		add_action( 'wp_footer', array( $this, 'print_inline_js' ), 99 );
 		return true;
+	}
+
+	/**
+	 * @param $content
+	 *
+	 * @return mixed
+	 */
+	public function encode_php_tags( $content ) {
+		$content = str_ireplace( array( '<?', '?>' ), array( '&lt;?', '?&gt;' ), $content );
+		return $content;
 	}
 
 	/**
