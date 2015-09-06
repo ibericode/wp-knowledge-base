@@ -70,7 +70,7 @@ class CodeHighlighting {
 
 	/**
 	 * @param $content
-	 *
+	 * @todo: This encodes all ?> and <? occurences in the entire post content. Ideally, we only want to apply this on our shortcode content...
 	 * @return mixed
 	 */
 	public function encode_php_tags( $content ) {
