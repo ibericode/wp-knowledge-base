@@ -49,7 +49,7 @@ class Categories {
 		$labels = array(
 			'name'              => __( 'KB Categories', 'wp-knowledge-base' ),
 			'singular_name'     => __( 'KB Category', 'wp-knowledge-base' ),
-			'menu_name'         => __( 'Categories' )
+			'menu_name'         => __( 'KB Categories' )
 		);
 
 		// register docs taxonomy: category
