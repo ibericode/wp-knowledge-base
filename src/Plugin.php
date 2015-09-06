@@ -100,7 +100,7 @@ final class Plugin {
 		$labels = array(
 			'name'              => __( 'KB Keywords', 'wp-knowledge-base' ),
 			'singular_name'     => __( 'KB Keyword', 'wp-knowledge-base' ),
-			'menu_name'         => __( 'Keywords' )
+			'menu_name'         => __( 'KB Keywords' )
 		);
 
 		// register docs taxonomy: keyword
@@ -140,6 +140,7 @@ final class Plugin {
 				'rewrite' => array( 'with_front' => false, 'slug' => $this->post_type_slug ),
 				'taxonomies' => array( $this->categories->taxonomy_name, self::TAXONOMY_KEYWORD_NAME ),
 				'has_archive' => ( Plugin::get_option( 'custom_archive_page_id' ) === 0 ),
+				'menu_icon'   => 'dashicons-info',
 				//'supports' => array( 'comments' ) //todo: finish migration to comments API & use that interface
 			)
 		);
