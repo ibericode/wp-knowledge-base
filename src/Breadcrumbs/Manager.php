@@ -34,6 +34,13 @@ class Manager {
 	}
 
 	/**
+	 * @return int
+	 */
+	public function get_archive_page_id() {
+		return $this->archive_page_id;
+	}
+
+	/**
 	 * Get the breadcrumb string
 	 *
 	 * @return string
