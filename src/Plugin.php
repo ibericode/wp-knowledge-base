@@ -97,12 +97,18 @@ final class Plugin {
 	 * Register KB taxonomies
 	 */
 	protected function register_taxonomies() {
+		$labels = array(
+			'name'              => __( 'KB Keywords', 'wp-knowledge-base' ),
+			'singular_name'     => __( 'KB Keyword', 'wp-knowledge-base' ),
+			'menu_name'         => __( 'Keywords' )
+		);
+
 		// register docs taxonomy: keyword
 		register_taxonomy(
 			self::TAXONOMY_KEYWORD_NAME,
 			self::POST_TYPE_NAME,
 			array(
-				'label' => __( 'Keyword', 'wp-knowledge-base' ),
+				'labels' => $labels,
 				'rewrite' => array( 'with_front' => false, 'slug' => $this->post_type_slug . '/keyword' ),
 				'hierarchical' => false,
 				'query_var' => true
@@ -114,17 +120,27 @@ final class Plugin {
 	 * Register KB post type
 	 */
 	protected function register_post_type() {
+
+		$labels = array(
+			'name'               => _x( 'KB Articles', 'post type general name', 'wp-knowledge-base' ),
+			'singular_name'      => _x( 'KB Article', 'post type singular name', 'wp-knowledge-base' ),
+			'new_item'           => __( 'New KB Article', 'wp-knowledge-base' ),
+			'update_item'        => __( 'Update KB Article', 'wp-knowledge-base' ),
+			'edit_item'          => __( 'Edit KB Article', 'wp-knowledge-base' ),
+			'add_new_item'       => __( 'Add new KB Article', 'wp-knowledge-base' )
+		);
+
 		// register docs post type
 		register_post_type(
 			self::POST_TYPE_NAME,
 			array(
 				'public' => true,
-				'label'  => 'KB Articles',
+				'labels' => $labels,
 				'hierarchical' => true,
 				'rewrite' => array( 'with_front' => false, 'slug' => $this->post_type_slug ),
 				'taxonomies' => array( $this->categories->taxonomy_name, self::TAXONOMY_KEYWORD_NAME ),
 				'has_archive' => ( Plugin::get_option( 'custom_archive_page_id' ) === 0 ),
-				//'supports' => array( 'comments' ) todo: finish migration to comments API & use that interface
+				//'supports' => array( 'comments' ) //todo: finish migration to comments API & use that interface
 			)
 		);
 	}

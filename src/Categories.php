@@ -45,12 +45,19 @@ class Categories {
 	}
 
 	public function register_taxonomy() {
+
+		$labels = array(
+			'name'              => __( 'KB Categories', 'wp-knowledge-base' ),
+			'singular_name'     => __( 'KB Category', 'wp-knowledge-base' ),
+			'menu_name'         => __( 'Categories' )
+		);
+
 		// register docs taxonomy: category
 		register_taxonomy(
 			$this->taxonomy_name,
 			$this->post_type,
 			array(
-				'label' => __( 'Category' ),
+				'labels' => $labels,
 				'rewrite' => array( 'slug' => $this->slug_base . '/category' ),
 				'hierarchical' => true,
 				'query_var' => true
