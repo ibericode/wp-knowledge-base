@@ -85,7 +85,7 @@ class ArticleList {
 			}
 
 			// add useful css class
-			$css_classes .= ' wpkb-list-category-' . $args['category'];
+			$css_classes .= ' wpkb-list-category-' . sanitize_title( $args['category'] );
 		}
 
 		// query by keyword?
@@ -105,7 +105,7 @@ class ArticleList {
 			}
 
 			// add useful css class
-			$css_classes .= ' wpkb-list-keyword-' . $args['keyword'];
+			$css_classes .= ' wpkb-list-keyword-' . sanitize_title( $args['keyword'] );
 		}
 
 		// start building output string
