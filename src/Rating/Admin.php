@@ -46,11 +46,19 @@ class Admin {
 	 * Registers the dashboard widget
 	 */
 	public function register_dashboard_widget() {
+
+		// only show to users who can moderate comments (ie: ratings)
+		if( ! current_user_can( 'moderate_comments' ) ) {
+			return false;
+		}
+
 		wp_add_dashboard_widget(
 			'wpkb_recent_ratings',         // Widget slug.
 			'Recent KB Ratings',         // Title.
 			array( $this, 'dashboard_widget' ) // Display function.
 		);
+
+		return true;
 	}
 
 	/**
