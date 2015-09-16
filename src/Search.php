@@ -101,7 +101,7 @@ class Search {
 		if( $this->is_search ) {
 			echo $this->build_result_html( $this->term, $this->results );
 		} elseif( ! $is_quick )  {
-			echo '<em>' . __( 'Type your search query in the field above.', 'wp-knowledge-base' ) . '</em>';
+			echo '<em class="wpkb-search-placeholder">' . __( 'Type your search query in the field above.', 'wp-knowledge-base' ) . '</em>';
 		}
 		// close search results div
 		?></div></div><?php

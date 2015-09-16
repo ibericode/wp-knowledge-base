@@ -30,6 +30,8 @@ window.WPKB_Search = (function($) {
 	 */
 	var cache = {};
 
+	var $loadingIndicator = $("<p><em>Searching..</em>");
+
 	$('.wpkb-search-term').keydown( function() {
 
 		window.clearTimeout( timer );
@@ -90,6 +92,10 @@ window.WPKB_Search = (function($) {
 
 		// set busy to true so no more shots will be fired
 		busy = true;
+
+		// remove placeholder & show loading indicator to user
+		$context.find('.wpkb-search-placeholder').remove();
+		$context.find('.wpkb-search-results').prepend( $loadingIndicator );
 
 		$.ajax({
 			url: wpkb_search_vars.ajaxurl,
