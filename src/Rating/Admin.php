@@ -126,6 +126,7 @@ class Admin {
 	public function show_meta_box( $post ) {
 
 		$ratings = $this->rating->get_post_ratings( $post->ID );
+		$average_rating = $this->rating->get_post_average( $post->ID );
 
 		if( count( $ratings ) === 0) {
 			echo '<p>No ratings for this article.</p>';
@@ -134,11 +135,12 @@ class Admin {
 
 		echo '<style type="text/css" scoped>.wpkb-ratings-table { border-collapse: collapse; } .wpkb-ratings-table th, .wpkb-ratings-table td{ border: 1px solid #eee; padding: 3px 6px; }</style>';
 
-		echo sprintf( '<p>The following %d ratings were left for this article.</p>', count( $ratings ) );
+		echo sprintf( '<p>This article has an average score of <span style="border-bottom: 4px solid #%s;">%.2f</span> based on %d rating(s).', $this->percent2Color( $average_rating ), ( $average_rating / 20 ), count( $ratings ) );
+
 		echo '<table class="wpkb-ratings-table" border="0">';
-		echo '<tr><th>Rating</th><th>IP address</th><th>Time</th><th>Message</th></tr>';
+		echo '<tr><th></th><th>Rating</th><th>IP address</th><th>Time</th><th>Message</th></tr>';
 		foreach( $ratings as $rating ) {
-			printf( '<tr><td>%d</td><td>%s</td><td><span title="%s">%s ago</span></td><td>%s</td></tr>', $rating->rating, $rating->author_IP, '', human_time_diff( strtotime( $rating->comment->comment_date_gmt ) ) , $rating->message );
+			printf( '<tr><td style="background: #%s;"></td><td>%d</td><td>%s</td><td><span title="%s">%s ago</span></td><td>%s</td></tr>', $this->percent2Color( $rating->rating * 20 ), $rating->rating, $rating->author_IP, '', human_time_diff( strtotime( $rating->comment->comment_date_gmt ) ) , $rating->message );
 		}
 		echo '</table>';
 
