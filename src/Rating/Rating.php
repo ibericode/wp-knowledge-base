@@ -61,6 +61,7 @@ class Rating {
 	public function __construct( $post_ID, $rating, $args = array() ) {
 		$this->post_ID = $post_ID;
 		$this->rating = $rating;
+		$this->percentage = ( $rating * 20 ) - 10;
 
 		if( ! empty( $args['message'] ) ) {
 			$this->message = $args['message'];

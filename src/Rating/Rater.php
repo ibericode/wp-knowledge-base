@@ -93,7 +93,7 @@ class Rater {
 	public function get_post_average( $post_ID ) {
 		global $wpdb;
 
-		$sql = "SELECT ( AVG(cm.meta_value) * 20 ) AS average_rating FROM $wpdb->comments c RIGHT JOIN $wpdb->commentmeta cm ON cm.comment_id = c.comment_ID WHERE cm.meta_key = '%s' AND c.comment_post_ID = %d";
+		$sql = "SELECT ( AVG( ( cm.meta_value * 20 ) - 10 ) ) AS average_rating FROM $wpdb->comments c RIGHT JOIN $wpdb->commentmeta cm ON cm.comment_id = c.comment_ID WHERE cm.meta_key = '%s' AND c.comment_post_ID = %d";
 		$query = $wpdb->prepare( $sql, '_wpkb_rating', $post_ID );
 
 		$var = $wpdb->get_var( $query );

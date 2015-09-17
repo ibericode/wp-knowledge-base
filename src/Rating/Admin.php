@@ -75,9 +75,9 @@ class Admin {
 
 		echo '<style type="text/css" scoped>.wpkb-ratings-table { border-collapse: collapse; } .wpkb-ratings-table th, .wpkb-ratings-table td{ text-align: left; border: 1px solid #eee; padding: 3px 6px; }</style>';
 		echo '<table class="wpkb-ratings-table" border="0">';
-		echo '<tr><th>Page</th><th>Rating</th><th>Time</th><th>Message</th></tr>';
+		echo '<tr><th></th><th>Page</th><th>Rating</th><th>Time</th><th>Message</th></tr>';
 		foreach( $ratings as $rating ) {
-			printf( '<tr><td><a href="%s">%s</a></td><td>%d</td><td><span title="%s">%s ago</span></td><td>%s</td></tr>', get_edit_post_link( $rating->post_ID ), get_the_title( $rating->post_ID ), $rating->rating, '', human_time_diff( strtotime( $rating->comment->comment_date_gmt ) ), substr( $rating->message, 0, 20 ) . ( ( strlen( $rating->message ) > 20 ) ? '..' : '' ) );
+			printf( '<tr><td style="background: #%s;"></td><td><a href="%s">%s</a></td><td>%d</td><td><span title="%s">%s ago</span></td><td>%s</td></tr>', $this->percent2Color( ( $rating->percentage ) ), get_edit_post_link( $rating->post_ID ), get_the_title( $rating->post_ID ), $rating->rating, '', human_time_diff( strtotime( $rating->comment->comment_date_gmt ) ), substr( $rating->message, 0, 20 ) . ( ( strlen( $rating->message ) > 20 ) ? '..' : '' ) );
 		}
 		echo '</table>';
 	}
@@ -135,12 +135,12 @@ class Admin {
 
 		echo '<style type="text/css" scoped>.wpkb-ratings-table { border-collapse: collapse; } .wpkb-ratings-table th, .wpkb-ratings-table td{ border: 1px solid #eee; padding: 3px 6px; }</style>';
 
-		echo sprintf( '<p>This article has an average score of <span style="border-bottom: 4px solid #%s;">%.2f</span> based on %d rating(s).', $this->percent2Color( $average_rating ), ( $average_rating / 20 ), count( $ratings ) );
+		echo sprintf( '<p>This article has an average score of <span style="border-bottom: 4px solid #%s;">%.2f</span> based on %d rating(s).', $this->percent2Color( $average_rating ), ceil( $average_rating / 20 ), count( $ratings ) );
 
 		echo '<table class="wpkb-ratings-table" border="0">';
 		echo '<tr><th></th><th>Rating</th><th>IP address</th><th>Time</th><th>Message</th></tr>';
 		foreach( $ratings as $rating ) {
-			printf( '<tr><td style="background: #%s;"></td><td>%d</td><td>%s</td><td><span title="%s">%s ago</span></td><td>%s</td></tr>', $this->percent2Color( $rating->rating * 20 ), $rating->rating, $rating->author_IP, '', human_time_diff( strtotime( $rating->comment->comment_date_gmt ) ) , $rating->message );
+			printf( '<tr><td style="background: #%s;"></td><td>%d</td><td>%s</td><td><span title="%s">%s ago</span></td><td>%s</td></tr>', $this->percent2Color( $rating->percentage ), $rating->rating, $rating->author_IP, '', human_time_diff( strtotime( $rating->comment->comment_date_gmt ) ) , $rating->message );
 		}
 		echo '</table>';
 
