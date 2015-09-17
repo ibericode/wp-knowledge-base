@@ -141,9 +141,23 @@ class Search {
 	 * Process AJAX search requests, returns a JSON response.
 	 */
 	public function process_ajax_search() {
+
+		$last_modified = get_option( 'wpkb_last_modified', time() );
+
+		header( "Last-Modified: " . gmdate( "D, d M Y H:i:s", $last_modified ) . " GMT" );
+		header( 'Cache-Control: public' );
+
+		if( isset( $_SERVER['HTTP_IF_MODIFIED_SINCE'] ) ) {
+			if( strtotime( $_SERVER['HTTP_IF_MODIFIED_SINCE'] ) == $last_modified ) {
+				header( "HTTP/1.1 304 Not Modified" );
+				exit;
+			}
+		}
+
 		$term = sanitize_text_field( $_GET['search'] );
 		$results = $this->search( $term );
 		$data = $this->build_result_html( $term, $results );
+
 		wp_send_json_success( $data );
 	}
 
