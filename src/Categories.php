@@ -58,7 +58,7 @@ class Categories {
 			$this->post_type,
 			array(
 				'labels' => $labels,
-				'rewrite' => array( 'slug' => $this->slug_base . '/category' ),
+				'rewrite' => array( 'with_front' => false, 'slug' => $this->slug_base . '/category' ),
 				'hierarchical' => true,
 				'query_var' => true
 			)
