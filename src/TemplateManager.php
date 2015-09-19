@@ -92,6 +92,12 @@ class TemplateManager {
 			add_filter( 'wp_head', array( $this, 'print_css_helpers' ) );
 		}
 
+		if( get_post_type() === Plugin::POST_TYPE_NAME
+		    || is_page( $this->wpkb->get_option( 'custom_archive_page_id' ) )
+		) {
+			add_filter( 'wp_footer', array( $this, 'print_js_helpers' ) );
+		}
+
 	}
 
 	/**
@@ -237,6 +243,9 @@ class TemplateManager {
 
 	/**
 	 * Print CSS helpers
+	 *
+	 * - .wpkb-alert with additional .success, .info or .warning class
+	 * - todo
 	 */
 	public function print_css_helpers() {
 		?>
@@ -268,7 +277,13 @@ class TemplateManager {
 	public function print_js_helpers() {
 		?>
 		<script type="text/javascript">
+			var wpkb_config = {
+				'base_path': '<?php echo esc_js( trailingslashit( Plugin::POST_TYPE_SLUG ) ); ?>',
+				'base_url': '<?php echo esc_url( get_post_type_archive_link( Plugin::POST_TYPE_NAME ) ); ?>'
+			};
+
 			(function() {
+				/* move alerts to start of post container  */
 				var alert = document.querySelector('.wpkb-alert');
 				if( alert ) {
 					var parent = document.querySelector('.wpkb-article');
