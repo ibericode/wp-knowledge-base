@@ -9,6 +9,8 @@ final class Plugin {
 	 */
 	const POST_TYPE_NAME = 'wpkb-article';
 
+	const POST_TYPE_SLUG = WPKB_POST_TYPE_SLUG;
+
 	/**
 	 * @const Slug of category taxonomy
 	 */
@@ -40,11 +42,6 @@ final class Plugin {
 	public $options = array();
 
 	/**
-	 * @var string
-	 */
-	protected $post_type_slug = 'kb';
-
-	/**
 	 * @var Categories
 	 */
 	public $categories;
@@ -56,15 +53,10 @@ final class Plugin {
 		$this->version = $version;
 		$this->file = $file;
 		$this->dir = $dir;
-
-		if( defined( 'WPKB_POST_TYPE_SLUG' ) ) {
-			$this->post_type_slug = WPKB_POST_TYPE_SLUG;
-		}
-
 		$this->options = $this->load_options();
 
 		// init categories
-		$this->categories = new Categories( self::POST_TYPE_NAME, $this->post_type_slug );
+		$this->categories = new Categories( self::POST_TYPE_NAME, self::POST_TYPE_SLUG );
 		$this->categories->add_hooks();
 
 		if( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
@@ -109,7 +101,7 @@ final class Plugin {
 			self::POST_TYPE_NAME,
 			array(
 				'labels' => $labels,
-				'rewrite' => array( 'with_front' => false, 'slug' => $this->post_type_slug . '/keyword' ),
+				'rewrite' => array( 'with_front' => false, 'slug' => self::POST_TYPE_SLUG . '/keyword' ),
 				'hierarchical' => false,
 				'query_var' => true
 			)
@@ -137,9 +129,9 @@ final class Plugin {
 				'public' => true,
 				'labels' => $labels,
 				'hierarchical' => true,
-				'rewrite' => array( 'with_front' => false, 'slug' => $this->post_type_slug ),
+				'rewrite' => array( 'with_front' => false, 'slug' => self::POST_TYPE_SLUG ),
 				'taxonomies' => array( $this->categories->taxonomy_name, self::TAXONOMY_KEYWORD_NAME ),
-				'has_archive' => ( Plugin::get_option( 'custom_archive_page_id' ) === 0 ),
+				'has_archive' => true,
 				'menu_icon'   => 'dashicons-info',
 				//'supports' => array( 'comments' ) //todo: finish migration to comments API & use that interface
 			)
@@ -181,6 +173,7 @@ final class Plugin {
 	 */
 	private function load_options() {
 
+		// todo: remove this default
 		$defaults = array(
 			'custom_archive_page_id' => 42540
 		);

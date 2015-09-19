@@ -39,6 +39,9 @@ define( 'WPKB_VERSION', '1.2' );
 // load composer autoloader
 require __DIR__ . '/vendor/autoload.php';
 
+// load constants
+require __DIR__ .'/constants.php';
+
 // instantiate main plugin file
 $GLOBALS['wpkb'] = $wpkb = new Plugin( WPKB_VERSION, __FILE__, __DIR__ );
 $wpkb->add_hooks();
