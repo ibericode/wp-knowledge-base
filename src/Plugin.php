@@ -133,7 +133,7 @@ final class Plugin {
 				'taxonomies' => array( $this->categories->taxonomy_name, self::TAXONOMY_KEYWORD_NAME ),
 				'has_archive' => true,
 				'menu_icon'   => 'dashicons-info',
-				//'supports' => array( 'comments' ) //todo: finish migration to comments API & use that interface
+				'supports' => array( 'title', 'editor', 'author', 'revisions' ) //todo: finish migration to comments API & use that interface
 			)
 		);
 	}
