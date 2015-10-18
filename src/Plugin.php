@@ -5,19 +5,22 @@ namespace WPKB;
 final class Plugin {
 
 	/**
-	 * @const Slug of the post type
+	 * @const string Slug of the post type
 	 */
 	const POST_TYPE_NAME = 'wpkb-article';
 
+	/**
+	 * @const string
+	 */
 	const POST_TYPE_SLUG = WPKB_POST_TYPE_SLUG;
 
 	/**
-	 * @const Slug of category taxonomy
+	 * @const string Slug of category taxonomy
 	 */
 	const TAXONOMY_CATEGORY_NAME = 'wpkb-category';
 
 	/**
-	 * @const Slug of keyword taxonomy
+	 * @const string Slug of keyword taxonomy
 	 */
 	const TAXONOMY_KEYWORD_NAME = 'wpkb-keyword';
 
