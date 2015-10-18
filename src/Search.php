@@ -128,7 +128,7 @@ class Search {
 			$html .= __( 'No articles found.', 'wp-knowledge-base' );
 		} else {
 			foreach( $results as $post ) {
-				$html .= sprintf( '<a href="%s">%s</a><br />', get_permalink( $post->ID ), get_the_title( $post->ID ) );
+				$html .= sprintf( '<a href="%s">%s</a><br />', get_permalink( $post->ID ), $post->post_title );
 			}
 		}
 
