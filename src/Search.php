@@ -270,7 +270,7 @@ class Search {
 			)
 		);
 
-		return $posts;
+		return (array) apply_filters( 'wpkb_search_results', $posts );
 	}
 
 
