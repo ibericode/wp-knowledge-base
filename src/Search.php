@@ -188,6 +188,11 @@ class Search {
 
 		do_action( 'wpkb_search', $original_term );
 
+		$results = apply_filters( 'wpkb_get_search_results', null, $original_term );
+		if( is_array( $results ) ) {
+			return $results;
+		}
+
 		// use SearchWP if possible
 		if( class_exists( 'SearchWP' ) ) {
 
