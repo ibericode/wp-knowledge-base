@@ -121,7 +121,7 @@ class Search {
 	 */
 	private function build_result_html( $term, array $results ) {
 
-		$html = '<strong>' . sprintf( __( 'Results for "%s"', 'wp-knowledge-base' ), $term ) . '</strong>';
+		$html = '<strong>' . sprintf( __( '%d results found for "%s"', 'wp-knowledge-base' ), count( $results ), $term ) . '</strong>';
 		$html .= '<p>';
 
 		if( count( $results ) === 0 ) {
