@@ -89,7 +89,7 @@ class Search {
 		<form action="" method="get" class="wpkb-search-form <?php echo ( $is_quick ) ? 'wpkb-quick-search-form' : ''; ?>">
 			<p>
 				<span class="wpkb-search-input">
-					<input type="text" name="wpkb-search" class="wpkb-search-term" placeholder="<?php esc_attr_e( ( $is_quick ) ? 'Quick Search' : 'What are you looking for?', 'wp-knowledge-base' ); ?>" required />
+					<input type="text" name="wpkb-search" class="wpkb-search-term" placeholder="<?php esc_attr_e( ( $is_quick ) ? 'Quick Search' : 'What are you looking for?', 'wp-knowledge-base' ); ?>" autocomplete="off" spellcheck="false" autocorrect="off" required />
 				</span>
 				<span class="wpkb-search-button" style="<?php echo ( $is_quick ) ? 'display: none;' : ''; ?>">
 					<input type="submit" value="<?php esc_attr_e( 'Search', 'wp-knowledge-base' ); ?>" />
