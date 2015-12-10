@@ -1,7 +1,7 @@
 <?php
 namespace WPKB\Rating;
 
-use stdClass;
+use WP_Comment;
 
 class Rating {
 
@@ -113,11 +113,11 @@ class Rating {
 	}
 
 	/**
-	 * @param array $comment
+	 * @param WP_Comment $comment
 	 *
 	 * @return Rating
 	 */
-	public static function from_comment( stdClass $comment ) {
+	public static function from_comment( $comment ) {
 		$rating_number = get_comment_meta( $comment->comment_ID, '_wpkb_rating', true );
 		$rating = new self( $comment->comment_post_ID, $rating_number );
 		$rating->comment = $comment;
