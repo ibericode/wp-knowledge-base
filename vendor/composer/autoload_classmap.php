@@ -15,7 +15,6 @@ return array(
     'WPKB\\CodeHighlighting' => $baseDir . '/src/CodeHighlighting.php',
     'WPKB\\Plugin' => $baseDir . '/src/Plugin.php',
     'WPKB\\Rating\\Admin' => $baseDir . '/src/Rating/Admin.php',
-    'WPKB\\Rating\\Collection' => $baseDir . '/src/Rating/Collection.php',
     'WPKB\\Rating\\Rater' => $baseDir . '/src/Rating/Rater.php',
     'WPKB\\Rating\\Rating' => $baseDir . '/src/Rating/Rating.php',
     'WPKB\\Search' => $baseDir . '/src/Search.php',
