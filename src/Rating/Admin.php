@@ -9,18 +9,13 @@ class Admin {
 	 */
 	protected $rating;
 
-	public function __construct() {
-		global $wpkb;
-		$this->rating = $wpkb->rating;
-
-		// run upgrade routine?
-		$db_version = (int) get_option( 'wpkb_version', 0 );
-		if( version_compare( $db_version, WPKB_VERSION, '<' ) ) {
-			$routine = new UpgradeRoutine( $db_version, WPKB_VERSION, $this->rating );
-			$routine->run();
-		}
+	public function __construct( Rater $rating ) {
+		$this->rating = $rating;
 	}
 
+	/**
+	 * Add hooks
+	 */
 	public function add_hooks() {
 		add_filter( 'manage_wpkb-article_posts_columns', array( $this, 'column_header' ), 10);
 		add_filter( 'manage_edit-wpkb-article_sortable_columns', array( $this, 'sortable_columns' ) );

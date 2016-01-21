@@ -72,7 +72,7 @@ $rating->add_hooks();
 $wpkb->attach( $rating, 'rating' );
 
 if( is_admin() ) {
-	$rating_admin = new Rating\Admin();
+	$rating_admin = new Rating\Admin( $rating );
 	$rating_admin->add_hooks();
 }
 
