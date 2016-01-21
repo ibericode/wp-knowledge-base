@@ -40,7 +40,9 @@ define( 'WPKB_VERSION', '1.2' );
 require __DIR__ . '/vendor/autoload.php';
 
 // load constants
-require __DIR__ .'/constants.php';
+require __DIR__ . '/constants.php';
+require __DIR__ . '/src/default-actions.php';
+require __DIR__ . '/src/default-filters.php';
 
 // instantiate main plugin file
 $GLOBALS['wpkb'] = $wpkb = new Plugin( WPKB_VERSION, __FILE__, __DIR__ );
