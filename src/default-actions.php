@@ -9,13 +9,14 @@ defined( 'ABSPATH' ) or exit;
 add_action( 'pre_get_posts', function( $query ) {
 	global $wpkb;
 
-	// only modify our own queries
-	if( empty( $query->query['post_type'] ) || $query->query['post_type'] !== 'wpkb-article' ) {
-		return;
-	}
+	/** @var $query WP_Query */
 
 	// detect overview pages
-	if( ! is_tax() && ! is_post_type_archive( 'wpkb-article' ) && ! is_page( $wpkb->options['custom_archive_page_id'] ) ) {
+	if(
+		! $query->is_tax( array( 'wpkb-category', 'wpkb-keyword' ) )
+	    && ! $query->is_post_type_archive( 'wpkb-article' )
+	    && ! $query->is_page( $wpkb->options['custom_archive_page_id'] )
+	) {
 		return;
 	}
 
