@@ -20,5 +20,5 @@ return array(
     'WPKB\\Search' => $baseDir . '/src/class-search.php',
     'WPKB\\ServiceContainer' => $baseDir . '/src/class-service-container.php',
     'WPKB\\TemplateManager' => $baseDir . '/src/class-template-manager.php',
-    'WPKB\\Term_List' => $baseDir . '/src/class-categories.php',
+    'WPKB\\Term_List' => $baseDir . '/src/class-term-list.php',
 );
