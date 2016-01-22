@@ -29,8 +29,8 @@ class Admin {
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 		add_action( 'admin_init', array( $this, 'listen' ) );
 		add_action( 'wp_dashboard_setup', array( $this, 'register_dashboard_widget' ) );
-		add_filter( 'manage_edit-comments_columns', array( $this, 'comments_column_header' ) );
-		add_filter( 'manage_comments_custom_column', array( $this, 'comments_column_content' ), 10, 2 );
+		//add_filter( 'manage_edit-comments_columns', array( $this, 'comments_column_header' ) );
+		//add_filter( 'manage_comments_custom_column', array( $this, 'comments_column_content' ), 10, 2 );
 	}
 
 	public function comments_column_header( $columns ) {

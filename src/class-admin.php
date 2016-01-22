@@ -14,8 +14,8 @@ class Admin {
 	}
 
 	public function add_hooks() {
-		add_action( 'restrict_manage_posts', array( $this, 'taxonomy_filter_restrict_manage_posts' ) );
-		add_filter( 'parse_query', array( $this, 'taxonomy_filter_post_type_request' ) );
+	//	add_action( 'restrict_manage_posts', array( $this, 'taxonomy_filter_restrict_manage_posts' ) );
+	//	add_filter( 'parse_query', array( $this, 'taxonomy_filter_post_type_request' ) );
 		add_action( 'save_post_' . Plugin::POST_TYPE_NAME, array( $this, 'save_kb_article' ), 10, 2 );
 	}
 
