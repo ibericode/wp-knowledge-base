@@ -5,14 +5,14 @@ namespace WPKB;
 final class Plugin {
 
 	/**
-	 * @const string Slug of the post type
-	 */
-	const POST_TYPE_NAME = 'wpkb-article';
-
-	/**
 	 * @const string
 	 */
 	const POST_TYPE_SLUG = WPKB_POST_TYPE_SLUG;
+
+	/**
+	 * @const string Slug of the post type
+	 */
+	const POST_TYPE_NAME = 'wpkb-article';
 
 	/**
 	 * @const string Slug of category taxonomy
@@ -27,45 +27,29 @@ final class Plugin {
 	/**
 	 * @var string
 	 */
-	private $version = '1.0';
+	private $version;
 
 	/**
-	 * @var
+	 * @var string
 	 */
 	private $file;
 
 	/**
-	 * @var
+	 * @var string
 	 */
 	private $dir;
 
 	/**
-	 * @var array
-	 */
-	public $options = array();
-
-	/**
-	 * @var Categories
-	 */
-	public $categories;
-
-	/**
 	 * Constructor
+	 *
+	 * @param string $version
+	 * @param string $file
+	 * @param string $dir
 	 */
 	public function __construct( $version, $file, $dir ) {
 		$this->version = $version;
 		$this->file = $file;
 		$this->dir = $dir;
-		$this->options = $this->load_options();
-
-		// init categories
-		$this->categories = new Categories( self::POST_TYPE_NAME, self::POST_TYPE_SLUG );
-		$this->categories->add_hooks();
-
-		if( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
-			$admin = new Admin();
-			$admin->add_hooks();
-		}
 	}
 
 	/**
@@ -73,7 +57,7 @@ final class Plugin {
 	 */
 	public function add_hooks() {
 		// add actions
-		add_action( 'init', array( $this, 'init' ) );
+		add_action( 'init', array( $this, 'init' ), 1);
 
 		// register (de)activation hooks
 		register_activation_hook( $this->file, array( $this, 'on_plugin_activation' ) );
@@ -84,6 +68,7 @@ final class Plugin {
 	 * Registers all terms, taxonomy's and post types.
 	 */
 	public function init() {
+
 		$this->register_taxonomies();
 		$this->register_post_type();
 	}
@@ -104,11 +89,38 @@ final class Plugin {
 			self::POST_TYPE_NAME,
 			array(
 				'labels' => $labels,
-				'rewrite' => array( 'with_front' => false, 'slug' => self::POST_TYPE_SLUG . '/keyword' ),
+				'rewrite' => array(
+					'with_front' => false,
+					'slug' => self::POST_TYPE_SLUG . '/keyword'
+				),
 				'hierarchical' => false,
+			)
+		);
+
+		register_taxonomy_for_object_type( self::TAXONOMY_KEYWORD_NAME, self::POST_TYPE_NAME );
+
+		$labels = array(
+			'name'              => __( 'KB Categories', 'wp-knowledge-base' ),
+			'singular_name'     => __( 'KB Category', 'wp-knowledge-base' ),
+			'menu_name'         => __( 'KB Categories' )
+		);
+
+		// register docs taxonomy: category
+		register_taxonomy(
+			self::TAXONOMY_CATEGORY_NAME,
+			self::POST_TYPE_NAME,
+			array(
+				'labels' => $labels,
+				'rewrite' => array(
+					'with_front' => false,
+					'slug' => self::POST_TYPE_SLUG . '/category'
+				),
+				'hierarchical' => true,
 				'query_var' => true
 			)
 		);
+		register_taxonomy_for_object_type( self::TAXONOMY_CATEGORY_NAME, self::POST_TYPE_NAME );
+
 	}
 
 	/**
@@ -133,7 +145,7 @@ final class Plugin {
 				'labels' => $labels,
 				'hierarchical' => true,
 				'rewrite' => array( 'with_front' => false, 'slug' => self::POST_TYPE_SLUG ),
-				'taxonomies' => array( $this->categories->taxonomy_name, self::TAXONOMY_KEYWORD_NAME ),
+				'taxonomies' => array( self::TAXONOMY_CATEGORY_NAME, self::TAXONOMY_KEYWORD_NAME ),
 				'has_archive' => true,
 				'menu_icon'   => 'dashicons-info',
 				'supports' => array( 'title', 'editor', 'author', 'revisions', 'custom-fields' ) //todo: finish migration to comments API & use that interface
@@ -155,39 +167,6 @@ final class Plugin {
 		add_action( 'shutdown', 'flush_rewrite_rules' );
 	}
 
-	/**
-	 * @param $index
-	 *
-	 * @return mixed
-	 */
-	public function get_option( $index ) {
-
-		// does the option exist?
-		if( isset( $this->options[ $index ] ) ) {
-			return $this->options[ $index ];
-		}
-
-		// return queried option
-		return null;
-	}
-
-	/**
-	 * Loads the options, makes sure defaults are taken into considerations
-	 */
-	private function load_options() {
-
-		// todo: remove this default
-		$defaults = array(
-			'custom_archive_page_id' => 42540
-		);
-
-		$options = get_option( 'wpkb', array() );
-
-		// merge options with defaults
-		$options = array_merge( $defaults, $options );
-
-		return $options;
-	}
 
 	/**
 	 * Return al WPKB extensions
@@ -243,13 +222,5 @@ final class Plugin {
 	 */
 	public function url( $path = '' ) {
 		return plugins_url( $path, $this->file );
-	}
-
-	/**
-	 * @param $instance
-	 * @param $name
-	 */
-	public function attach( $instance, $variable_name ) {
-		$this->$variable_name = $instance;
 	}
 }

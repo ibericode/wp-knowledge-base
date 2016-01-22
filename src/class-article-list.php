@@ -2,12 +2,7 @@
 
 namespace WPKB;
 
-class ArticleList {
-
-	/**
-	 * @const string
-	 */
-	const SHORTCODE = 'wpkb_list';
+class Article_List {
 
 	/**
 	 * @var array
@@ -26,31 +21,13 @@ class ArticleList {
 	private $html = '';
 
 	/**
-	 * Initialize the shortcode
-	 */
-	public static function register_shortcode() {
-		// register shortcode
-		add_shortcode( self::SHORTCODE, array( __CLASS__, 'shortcode' ) );
-	}
-
-	/**
-	 * @param array  $args
-	 * @param string $content
-	 *
-	 * @return ArticleList
-	 */
-	public static function shortcode( $args = array(), $content = '' ) {
-		return new ArticleList( $args );
-	}
-
-	/**
 	 * Constructor
 	 *
 	 * @param array $args
 	 */
 	public function __construct( $args = array() ) {
 
-		$args = shortcode_atts( $this->defaults, $args, self::SHORTCODE );
+		$args = shortcode_atts( $this->defaults, $args );
 
 		$query_args = array(
 			'post_type' => Plugin::POST_TYPE_NAME,

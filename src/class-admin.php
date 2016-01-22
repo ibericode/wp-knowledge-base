@@ -67,6 +67,9 @@ class Admin {
 		}
 	}
 
+	/**
+	 * @param $query
+	 */
 	function taxonomy_filter_post_type_request( $query ) {
 		global $pagenow, $typenow;
 

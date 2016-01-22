@@ -9,6 +9,11 @@ class Admin {
 	 */
 	protected $rating;
 
+	/**
+	 * Admin constructor.
+	 *
+	 * @param Rater $rating
+	 */
 	public function __construct( Rater $rating ) {
 		$this->rating = $rating;
 	}
@@ -17,24 +22,32 @@ class Admin {
 	 * Add hooks
 	 */
 	public function add_hooks() {
-		add_filter( 'manage_wpkb-article_posts_columns', array( $this, 'column_header' ), 10);
+		add_filter( 'manage_wpkb-article_posts_columns', array( $this, 'column_header' ), 10 );
 		add_filter( 'manage_edit-wpkb-article_sortable_columns', array( $this, 'sortable_columns' ) );
-		add_action( 'manage_wpkb-article_posts_custom_column', array( $this, 'column_content' ), 10, 2);
+		add_action( 'manage_wpkb-article_posts_custom_column', array( $this, 'column_content' ), 10, 2 );
 		add_filter( 'pre_get_posts', array( $this, 'sortable_orderby' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 		add_action( 'admin_init', array( $this, 'listen' ) );
 		add_action( 'wp_dashboard_setup', array( $this, 'register_dashboard_widget' ) );
+		add_filter( 'manage_edit-comments_columns', array( $this, 'comments_column_header' ) );
+		add_filter( 'manage_comments_custom_column', array( $this, 'comments_column_content' ), 10, 2 );
+	}
 
-		// hide ratings by default
-		add_filter( 'pre_get_comments', function( $query ) {
-			if( $query->query_vars['type'] === '_wpkb_rating' ) {
-				return $query;
-			}
+	public function comments_column_header( $columns ) {
+		$columns['wpkb_rating'] = 'KB Rating';
+		return $columns;
+	}
 
-			// hide by default
-			$query->query_vars['type__not_in'][] = '_wpkb_rating';
-			return $query;
-		});
+	public function comments_column_content( $column, $comment_ID ) {
+		if ( 'wpkb_rating' !== $column ) {
+			return;
+		}
+
+		$comment = get_comment( $comment_ID );
+		if( $comment->comment_type === '_wpkb_rating' ) {
+			$rating = Rating::from_comment( $comment );
+			echo $rating->rating;
+		}
 	}
 
 	/**

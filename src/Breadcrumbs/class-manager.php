@@ -7,7 +7,7 @@ class Manager {
 	/**
 	 * @var int
 	 */
-	protected $archive_page_id = 0;
+	protected $archive_page_id;
 
 	/**
 	 * @param int $archive_page_id
@@ -18,9 +18,9 @@ class Manager {
 
 	public function add_hooks() {
 		add_filter( 'wpkb_extensions', array( $this, 'register_extension' ) );
-		add_action( 'wpkb_before_article_content', array( $this, 'add_breadcrumb' ) );
-		add_action( 'wpkb_before_category_archive', array( $this, 'add_breadcrumb' ) );
-		add_action( 'wpkb_before_keyword_archive', array( $this, 'add_breadcrumb' ) );
+		add_action( 'wpkb_before_article_content', array( $this, 'output' ) );
+		add_action( 'wpkb_before_category_archive', array( $this, 'output' ) );
+		add_action( 'wpkb_before_keyword_archive', array( $this, 'output' ) );
 	}
 
 	/**
@@ -34,18 +34,11 @@ class Manager {
 	}
 
 	/**
-	 * @return int
-	 */
-	public function get_archive_page_id() {
-		return $this->archive_page_id;
-	}
-
-	/**
 	 * Get the breadcrumb string
 	 *
 	 * @return string
 	 */
-	public function get() {
+	public function get_output() {
 		$crumbs = new Crumbs( $this->archive_page_id );
 		$crumbs->build_crumbs();
 		return $crumbs->build_html();
@@ -54,8 +47,8 @@ class Manager {
 	/**
 	 * Output the breadcrumb
 	 */
-	public function add_breadcrumb() {
-		echo $this->get();
+	public function output() {
+		echo $this->get_output();
 		$this->relocate_crumbs();
 	}
 

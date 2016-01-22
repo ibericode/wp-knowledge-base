@@ -39,48 +39,51 @@ define( 'WPKB_VERSION', '1.2' );
 // load composer autoloader
 require __DIR__ . '/vendor/autoload.php';
 
-// load constants
-require __DIR__ . '/constants.php';
+
+// load constants, filters, actions & shortcodes
+require __DIR__ . '/src/constants.php';
 require __DIR__ . '/src/default-actions.php';
 require __DIR__ . '/src/default-filters.php';
+require __DIR__ . '/src/shortcodes.php';
 
-// instantiate main plugin file
-$GLOBALS['wpkb'] = $wpkb = new Plugin( WPKB_VERSION, __FILE__, __DIR__ );
-$wpkb->add_hooks();
+// instantiate object tree
+global $wpkb;
 
-// load breadcrumbs
-$breadcrumbs = new Breadcrumbs\Manager( $wpkb->get_option('custom_archive_page_id') );
-$breadcrumbs->add_hooks();
-$wpkb->attach( $breadcrumbs, 'breadcrumbs' );
+$wpkb = wpkb();
 
-// load search
-$search = new Search( $wpkb );
-$search->add_hooks();
-$wpkb->attach( $search, 'search' );
+$wpkb['plugin'] = $plugin = new Plugin( WPKB_VERSION, __FILE__, __DIR__ );
+$wpkb['options'] = $options = new Options( 'wpkb', array(
+	'custom_archive_page_id' => 42540
+	)
+);
+$wpkb['breadcrumbs'] = $breadcrumbs = new Breadcrumbs\Manager( $options->get( 'custom_archive_page_id' ) );
+$wpkb['search'] = $search = new Search( $plugin );
+$wpkb['categories'] = new Term_List( Plugin::TAXONOMY_CATEGORY_NAME );
+$wpkb['keywords'] = new Term_List( Plugin::TAXONOMY_KEYWORD_NAME );
 
-// load code highlighter
-$highlighting = new CodeHighlighting( $wpkb );
-$highlighting->add_hooks();
-
-// load callouts
+$highlighting = new CodeHighlighting( $plugin );
 $callouts = new Callouts();
-$callouts->add_hooks();
-
-// rating
 $rating = new Rating\Rater();
-$rating->add_hooks();
-$wpkb->attach( $rating, 'rating' );
 
-if( is_admin() ) {
+// hook!
+$plugin->add_hooks();
+$breadcrumbs->add_hooks();
+$search->add_hooks();
+$highlighting->add_hooks();
+$callouts->add_hooks();
+$rating->add_hooks();
+
+// load admin specific code
+if( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
+	$admin = new Admin();
+	$admin->add_hooks();
+
 	$rating_admin = new Rating\Admin( $rating );
 	$rating_admin->add_hooks();
 }
 
-// load template manager
-add_action( 'template_redirect', function() use ( $wpkb ) {
-	$template = new TemplateManager( $wpkb );
+// load template specific stuff
+add_action( 'template_redirect', function() use ( $options ) {
+	$template = new TemplateManager( $options->get( 'custom_archive_page_id' ) );
 	$template->override_templates();
 });
-
-// Register [wpkb_list] shortcode
-ArticleList::register_shortcode();

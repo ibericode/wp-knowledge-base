@@ -3,19 +3,20 @@
 namespace WPKB;
 
 use WP_Screen;
+use WPKB\Plugin;
 
 class CodeHighlighting {
 
 	/**
 	 * @var Plugin
 	 */
-	protected $wpkb;
+	protected $plugin;
 
 	/**
 	 * @param $plugin
 	 */
-	public function __construct( \WPKB\Plugin $wpkb ) {
-		$this->wpkb = $wpkb;
+	public function __construct( Plugin $plugin ) {
+		$this->plugin = $plugin;
 	}
 
 	/**
@@ -85,7 +86,7 @@ class CodeHighlighting {
 
 		$min = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 
-		wp_register_style( 'wpkb-code-highlighting', $this->wpkb->url( '/assets/css/code-highlighting' . $min . '.css' ) );
+		wp_register_style( 'wpkb-code-highlighting', $this->plugin->url( '/assets/css/code-highlighting' . $min . '.css' ) );
 		wp_register_script( 'wpkb-code-highlighting', '//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js', array( ), false, true );
 
 		wp_enqueue_style( 'wpkb-code-highlighting' );

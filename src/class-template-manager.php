@@ -15,15 +15,15 @@ class TemplateManager {
 	private $templates = array( 'page.php', 'single.php', 'index.php' );
 
 	/**
-	 * @var Plugin
+	 * @var int
 	 */
-	protected $wpkb;
+	private $archive_page_id;
 
 	/**
-	 * @param Plugin $wpkb
+	 * @param int $archive_page_id
 	 */
-	public function __construct( Plugin $wpkb ) {
-		$this->wpkb = $wpkb;
+	public function __construct( $archive_page_id ) {
+		$this->archive_page_id = $archive_page_id;
 	}
 
 	/**
@@ -59,12 +59,10 @@ class TemplateManager {
 		if( is_post_type_archive( Plugin::POST_TYPE_NAME ) ) {
 
 			// load template for a single page
-			$custom_archive_page_id = $this->wpkb->get_option( 'custom_archive_page_id' );
-
-			if( $custom_archive_page_id > 0 ) {
+			if( $this->archive_page_id > 0 ) {
 
 				// if we're using a custom archive page, that one should be used
-				$archive_link = get_permalink( $custom_archive_page_id );
+				$archive_link = get_permalink( $this->archive_page_id );
 
 				if( $archive_link !== get_post_type_archive_link( Plugin::POST_TYPE_NAME ) ) {
 					wp_redirect( $archive_link );
@@ -92,8 +90,9 @@ class TemplateManager {
 			add_filter( 'wp_head', array( $this, 'print_css_helpers' ) );
 		}
 
-		if( get_post_type() === Plugin::POST_TYPE_NAME
-		    || is_page( $this->wpkb->get_option( 'custom_archive_page_id' ) )
+		if(
+			get_post_type() === Plugin::POST_TYPE_NAME
+		    || is_page( $this->archive_page_id )
 		) {
 			add_filter( 'wp_footer', array( $this, 'print_js_helpers' ) );
 		}

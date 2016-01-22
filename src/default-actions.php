@@ -2,20 +2,21 @@
 
 defined( 'ABSPATH' ) or exit;
 
-
 /**
  * Remove articles with custom-field "hidden_from_archive" and value "1" form overview pages.
  */
-add_action( 'pre_get_posts', function( $query ) {
-	global $wpkb;
+add_action( 'pre_get_posts', function( WP_Query $query ) {
 
-	/** @var $query WP_Query */
+	// make sure we have something to act on.. static pages don't have the globals
+	if( empty( $query->query ) ) {
+		return;
+	}
 
 	// detect overview pages
 	if(
 		! $query->is_tax( array( 'wpkb-category', 'wpkb-keyword' ) )
 	    && ! $query->is_post_type_archive( 'wpkb-article' )
-	    && ! $query->is_page( $wpkb->options['custom_archive_page_id'] )
+	    && ! $query->is_page( wpkb('options')->get( 'custom_archive_page_id' ) )
 	) {
 		return;
 	}
