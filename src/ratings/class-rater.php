@@ -13,6 +13,9 @@ class Rater {
 	 */
 	public function add_hooks() {
 		add_filter( 'the_content', array( $this, 'add_voting_options' ) );
+
+		add_action( 'wp_head', array( $this, 'print_styles' ) );
+		add_action( 'wp_footer', array( $this, 'print_scripts' ) );
 		add_action( 'init', array( $this, 'listen' ) );
 	}
 
@@ -23,9 +26,9 @@ class Rater {
 	 */
 	public function create_from_request() {
 
-		$rating_number = ( isset( $_GET['rating'] ) ) ? absint( $_GET['rating'] ) : 0;
-		$post_id = ( isset( $_GET['id'] ) ) ? absint( $_GET['id'] ) : 0;
-		$message = ( isset( $_REQUEST['message'] ) ) ? nl2br( sanitize_text_field( substr( $_REQUEST['message'], 0, 255 ) ) ) : '';
+		$rating_number = ( isset( $_POST['rating'] ) ) ? absint( $_POST['rating'] ) : 0;
+		$post_id = ( isset( $_POST['id'] ) ) ? absint( $_POST['id'] ) : 0;
+		$message = ( isset( $_POST['message'] ) ) ? nl2br( sanitize_text_field( substr( $_POST['message'], 0, 255 ) ) ) : '';
 
 		// rating must be given, post id must be given, rating must be between 1 and 5
 		if( ! $rating_number || ! $post_id || $rating_number < 1 || $rating_number > 5) {
@@ -104,6 +107,11 @@ class Rater {
 		return 0;
 	}
 
+	/**
+	 * @param array $args
+	 *
+	 * @return array
+	 */
 	public function get_ratings( $args = array() ) {
 		$args = array_merge( array(
 			'type' => '_wpkb_rating',
@@ -186,7 +194,7 @@ class Rater {
 	 */
 	public function listen() {
 
-		if( ! isset( $_GET['wpkb_action'] ) || $_GET['wpkb_action'] !== 'rate' ) {
+		if( ! isset( $_POST['wpkb_action'] ) || $_POST['wpkb_action'] !== 'rate' ) {
 			return false;
 		}
 
@@ -209,46 +217,11 @@ class Rater {
 		// update average (for sortable columns);
 		update_post_meta( $rating->post_ID, 'wpkb_rating_perc', $this->get_post_average( $rating->post_ID ) );
 
-		// clean output buffer so we can redirect
-		if( ob_get_level() > 0 ) {
-			ob_clean();
-		}
-
 		// respond
-		if( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-
-		} else {
-
-			if( ! isset( $_REQUEST['message'] ) && $rating->rating <= 2 ) {
-				// ask for further feedback
-				wp_die( $this->get_feedback_form(), 'Thanks for rating! - ' . get_bloginfo( 'name' ), 200 );
-			}
-
-			$url = remove_query_arg( array( 'wpkb_action', 'id', 'rating' ) );
-			$url = add_query_arg( array( 'wpkb-rated' => 1 ), $url );
-			wp_safe_redirect( $url );
-			exit;
-		}
-
-		return true;
-	}
-
-	/**
-	 * @return string
-	 */
-	protected function get_feedback_form() {
-		ob_start();
-
-		?>
-		<form method="POST">
-			<h3>What should we do to improve this article?</h3>
-			<p><label for="message">Please explain in short why you did not find this article helpful. We would like to improve it based on your feedback!</label></p>
-			<p><textarea id="message" rows="10" name="message" maxlength="255" style="width: 100%;"></textarea></p>
-			<p><input type="submit" class="button" value="Submit"></p>
-			<div style="position: absolute; left: -9999999px;"><input type="text" name="url" value="" /></div>
-		</form>
-		<?php
-		return ob_get_clean();
+		$url = remove_query_arg( array( 'wpkb_action', 'id', 'rating' ) );
+		$url = add_query_arg( array( 'wpkb-rated' => 1 ), $url );
+		wp_safe_redirect( $url );
+		exit;
 	}
 
 	/**
@@ -262,20 +235,59 @@ class Rater {
 			return $content;
 		}
 
-		$html = '';
-
+		// add message to content if we just rated
 		if( isset( $_GET['wpkb-rated'] ) ) {
 			$text = __( 'Thank you for your feedback!', 'wp-knowledge-base' );
-			$html .= '<div class="wpkb-alert info">'. $text .'</div>';
+			$content = '<div class="wpkb-alert info">'. $text .'</div>' . PHP_EOL . $content;
 		}
 
-		$link = add_query_arg( array(
-				'wpkb_action' => 'rate',
-				'id' => get_the_ID(),
-			)
-		);
+		// create form HTML
+		$html = '<form method="POST" class="wpkb-rating">';
 
-		$html .= '<p class="wpkb-rating">' . sprintf( 'Was this article helpful? <a href="%s" rel="nofollow" class="wpkb-rating-option wpkb-rating-5">Yes</a> &middot; <a href="%s" rel="nofollow" class="wpkb-rating-option wpkb-rating-1">No</a>', $link . '&rating=5', $link . '&rating=1' ) . '</p>';
+		// Rating options
+		$html .= '<p>';
+		$html .= __( 'Was this article helpful?', 'wp-knowledge-base' );
+		$html .= ' ';
+		$html .= sprintf( '<label><input type="radio" name="rating" class="wpkb-rating-option wpkb-rating-5" value="%d">%s</label>', 5, esc_html__( 'Yes' ) );
+		$html .= ' &middot; ';
+		$html .= sprintf( '<label><input type="radio" name="rating" class="wpkb-rating-option wpkb-rating-1" value="%d">%s</label>', 1, esc_html__( 'No' ) );
+		$html .= '</p>';
+
+		// Message
+		$html .= '<div class="wpkb-rating-message">';
+		$html .= '<p>';
+		$html .= '<label for="message">' . __( 'What was not helpful?', 'wp-knowledge-base' ) . '</label>';
+		$html .= '<textarea id="message" rows="3" name="message" style="width: 100%;"></textarea>';
+		$html .= '</p>';
+		$html .= '<p><input type="submit" value="' . esc_attr__( 'Submit feedback', 'wp-knowledge-base' ) . '" /></p>';
+		$html .= '</div>';
+
+		// honeypot
+		$html .= '<div style="position: absolute; left: -9999999px;"><input type="text" name="url" value="" /></div>';
+
+		// necessary form values
+		$html .= sprintf( '<input type="hidden" name="id" value="%d" />', get_the_ID() );
+		$html .= '<input type="hidden" name="wpkb_action" value="rate" />';
+		$html .= '</form>';
+
 		return $content . PHP_EOL . $html;
+	}
+
+	/**
+	 * Print <style>
+	 */
+	public function print_styles() {
+		echo '<style type="text/css">';
+		echo '.wpkb-rating label { display: inline-block; margin-left: 5px; cursor: pointer; }';
+		echo '</style>';
+	}
+
+	/**
+	 * Print <script>
+	 */
+	public function print_scripts() {
+		echo '<script type="text/javascript">';
+		require __DIR__ . '/script.js';
+		echo '</script>';
 	}
 }
