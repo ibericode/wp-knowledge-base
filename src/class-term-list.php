@@ -20,9 +20,9 @@ class Term_List {
 	}
 
 	/**
-	 * @return array|\WP_Error
+	 * @return string
 	 */
-	public function output( ) {
+	public function __toString( ) {
 		global $post;
 
 		$args = array(

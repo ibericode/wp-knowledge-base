@@ -265,7 +265,7 @@ class Search {
 
 		$posts = get_posts(
 			array(
-				'post_type' => Plugin::POST_TYPE_NAME,
+				'post_type' => 'wpkb-article',
 				'post__in' => $ids
 			)
 		);

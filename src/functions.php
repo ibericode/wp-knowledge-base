@@ -37,14 +37,14 @@ function wpkb_article_list( $args ) {
  * @return string
  */
 function wpkb_keyword_list() {
-	return wpkb('keywords')->output();
+	return wpkb('keywords');
 }
 
 /**
  * @return string
  */
 function wpkb_category_list() {
-	return wpkb('categories')->output();
+	return wpkb('categories');
 }
 
 /**
@@ -60,5 +60,5 @@ function wpkb_search_form( $args = array() ) {
  * @return string
  */
 function wpkb_breadcrumbs() {
-	return wpkb( 'breadcrumbs' )->get_output();
+	return wpkb( 'breadcrumbs' );
 }

@@ -2,7 +2,7 @@
 
 namespace WPKB\Breadcrumbs;
 
-use WPKB\Plugin;
+use WP_Post;
 
 class Crumbs {
 
@@ -12,16 +12,16 @@ class Crumbs {
 	private $crumbs = array();
 
 	/**
-	 * @var int
+	 * @var WP_Post|null
 	 */
-	protected $base_page_id = 0;
+	private $archive_page;
 
 	/**
-	 * Constructor
-	 * @param int $base_page_id
+	 * Crumbs constructor.
 	 */
-	public function __construct( $base_page_id = 0 ) {
-		$this->base_page_id = $base_page_id;
+	public function __construct( $archive_page = null ) {
+		$this->archive_page = $archive_page;
+		$this->build_crumbs();
 	}
 
 	/**
@@ -38,12 +38,12 @@ class Crumbs {
 	}
 
 	/**
-	 * @param        $term
+	 * @param mixed $term
 	 * @param string $term_type
 	 *
 	 * @return bool
 	 */
-	private function add_term_crumb( $term, $term_type = Plugin::TAXONOMY_CATEGORY_NAME ) {
+	private function add_term_crumb( $term, $term_type ) {
 
 		// if term is not an object, query it.
 		if( ! is_object( $term ) && is_int( $term ) ) {
@@ -68,37 +68,33 @@ class Crumbs {
 	/**
 	 * Build the array of crumbs
 	 */
-	public function build_crumbs() {
+	private function build_crumbs() {
 
 		$object = get_queried_object();
 
 		// add base to crumb
-		if( $this->base_page_id > 0 ) {
-			$this->add_crumb( get_permalink( $this->base_page_id ), get_the_title( $this->base_page_id ) );
-		} else {
-			$this->add_crumb ( get_post_type_archive_link( Plugin::POST_TYPE_NAME ), __( 'Knowledge Base', 'wpdocs' ) );
-		}
+		$base_title = $this->archive_page ? $this->archive_page->post_title : __( 'Knowledge Base', 'wpdocs' );
+		$this->add_crumb ( get_post_type_archive_link( 'wpkb-article' ), $base_title );
 
-
-		if( is_singular( Plugin::POST_TYPE_NAME ) ) {
+		if( is_singular( 'wpkb-article' ) ) {
 
 			// add category
-			$categories = wp_get_object_terms( $object->ID, Plugin::TAXONOMY_CATEGORY_NAME );
+			$categories = wp_get_object_terms( $object->ID, 'wpkb-category' );
 
 			if( is_array( $categories ) && isset( $categories[0] ) && is_object( $categories[0] ) ) {
-				$this->add_term_crumb( $categories[0], Plugin::TAXONOMY_CATEGORY_NAME );
+				$this->add_term_crumb( $categories[0], 'wpkb-category' );
 			}
 
 			// add doc title
 			$this->add_crumb( get_permalink( $object ), get_the_title( $object ) );
 
-		} elseif( is_tax( Plugin::TAXONOMY_CATEGORY_NAME ) ) {
+		} elseif( is_tax( 'wpkb-category' ) ) {
 
-			$this->add_term_crumb( $object, Plugin::TAXONOMY_CATEGORY_NAME );
+			$this->add_term_crumb( $object, 'wpkb-category' );
 
-		} elseif( is_tax( Plugin::TAXONOMY_KEYWORD_NAME ) ) {
+		} elseif( is_tax( 'wpkb-keyword' ) ) {
 
-			$this->add_term_crumb( $object, Plugin::TAXONOMY_KEYWORD_NAME );
+			$this->add_term_crumb( $object, 'wpkb-keyword' );
 
 		}
 	}
@@ -164,6 +160,19 @@ class Crumbs {
 		$output .= '</div>';
 
 		return $output;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function __toString() {
+		static $html;
+
+		if( ! $html ) {
+			$html = $this->build_html();
+		}
+
+		return $html;
 	}
 
 

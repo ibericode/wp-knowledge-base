@@ -97,7 +97,7 @@ class Callouts {
 	public function add_quicktags() {
 		$screen = get_current_screen();
 
-		if( ! $screen instanceof WP_Screen || $screen->parent_base !== 'edit' || $screen->post_type !== Plugin::POST_TYPE_NAME ) {
+		if( ! $screen instanceof WP_Screen || $screen->parent_base !== 'edit' || $screen->post_type !== 'wpkb-article' ) {
 			return false;
 		}
 

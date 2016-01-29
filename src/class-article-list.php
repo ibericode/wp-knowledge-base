@@ -30,7 +30,7 @@ class Article_List {
 		$args = shortcode_atts( $this->defaults, $args );
 
 		$query_args = array(
-			'post_type' => Plugin::POST_TYPE_NAME,
+			'post_type' => 'wpkb-article',
 			'posts_per_page' => -1,
 			'post_status' => 'publish',
 		);
@@ -50,11 +50,11 @@ class Article_List {
 		if( '' !== $args['category'] ) {
 
 			// add to query arguments
-			$query_args[ Plugin::TAXONOMY_CATEGORY_NAME ] = $args['category'];
+			$query_args[ 'wpkb-category' ] = $args['category'];
 
 			// if no title has been set, use the term name
 			if( '' === $title ) {
-				$term = get_term_by( 'name', $args['category'], Plugin::TAXONOMY_CATEGORY_NAME );
+				$term = get_term_by( 'name', $args['category'], 'wpkb-category' );
 
 				if( is_object( $term ) ) {
 					$title = $term->name;
@@ -69,11 +69,11 @@ class Article_List {
 		if( '' !== $args['keyword'] ) {
 
 			// add to query arguments
-			$query_args[ Plugin::TAXONOMY_KEYWORD_NAME ] = $args['keyword'];
+			$query_args[ 'wpkb-keyword' ] = $args['keyword'];
 
 			// if no title has been set, use the term name
 			if( '' === $title ) {
-				$term = get_term_by( 'name', $args['keyword'], Plugin::TAXONOMY_KEYWORD_NAME );
+				$term = get_term_by( 'name', $args['keyword'], 'wpkb-keyword' );
 
 				// if no title has been set, use the term name
 				if( is_object( $term ) ) {
@@ -90,37 +90,31 @@ class Article_List {
 		$output .= '<h3 class="wpkb-list-title">' . esc_html( $title ) . '</h3>';
 
 		// query docs
-		$docs = new \WP_Query( $query_args );
+		$query = new \WP_Query( $query_args );
+		$posts = $query->get_posts();
 
 		$output .= '<div class="wpkb-list-content">';
 
-		if( $docs->have_posts() ) {
+		if( $posts ) {
 
 			$output .= '<ul>';
+			$odd = false;
 
-			while( $docs->have_posts() ) {
-				$docs->the_post();
+			foreach( $posts as $post ) {
+				$odd = ! $odd;
 
 				// build string of css classes for this list element
-				$css_classes = 'wpkb-article-' . get_the_ID();
+				$css_classes = 'wpkb-article-' . $post->ID;
+				$css_classes .= $odd ? ' wpkb-odd' : ' wpkb-even';
 
-				$css_classes .= ( $docs->current_post % 2 ) ? ' wpkb-odd' : ' wpkb-even';
-
-				if( $docs->current_post === 1 ) {
-					$css_classes .= ' wpkb-first';
-				} elseif( $docs->current_post + 1 === $docs->post_count ) {
-					$css_classes .= ' wpkb-last';
-				}
-
-				$output .= '<li class="' . $css_classes . '"><a href="'. get_permalink() .'">' . get_the_title() . '</a></li>';
+				// build html for list item
+				$output .= '<li class="' . $css_classes . '"><a href="'. get_permalink( $post ) .'">' . get_the_title( $post ) . '</a></li>';
 			}
 
 			$output .= '</ul>';
 		} else {
 			$output .= '<p>' . __( 'No documentation articles.', 'wp-knowledge-base' ) . '</p>';
 		}
-
-		wp_reset_postdata();
 
 		$output .= '</div>';
 		$output .= '</div>';
