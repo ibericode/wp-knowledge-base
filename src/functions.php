@@ -62,3 +62,5 @@ function wpkb_search_form( $args = array() ) {
 function wpkb_breadcrumbs() {
 	return wpkb( 'breadcrumbs' );
 }
+
+require_once __DIR__ . '/table-of-contents/functions.php';
