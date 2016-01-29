@@ -5,7 +5,9 @@
 		if( this.checked && this.value > 3 ) {
 			this.form.submit();
 		} else {
-			this.parentNode.parentNode.parentNode.querySelector('.wpkb-rating-message').style.display = 'block';
+			var messageWrap = this.parentNode.parentNode.parentNode.querySelector('.wpkb-rating-message');
+			messageWrap.style.display = 'block';
+			messageWrap.querySelector('textarea').focus();
 		}
 	}
 
