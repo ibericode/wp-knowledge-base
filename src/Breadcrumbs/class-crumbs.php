@@ -18,6 +18,8 @@ class Crumbs {
 
 	/**
 	 * Crumbs constructor.
+	 *
+	 * @param WP_Post $archive_page
 	 */
 	public function __construct( $archive_page = null ) {
 		$this->archive_page = $archive_page;
@@ -168,12 +170,11 @@ class Crumbs {
 	public function __toString() {
 		static $html;
 
-		if( ! $html ) {
+		if( ! is_string( $html ) ) {
 			$html = $this->build_html();
 		}
 
 		return $html;
 	}
-
 
 }
