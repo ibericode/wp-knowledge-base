@@ -80,14 +80,14 @@ $callouts = new Callouts();
 $callouts->add_hooks();
 
 // article ratings
-$rating = new Rating\Rater();
-$rating->add_hooks();
+$wpkb['ratings'] = $ratings = new Rating\Rater();
+$ratings->add_hooks();
 
 // load admin specific code
 if( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
 	$admin = new Admin( $options );
 	$admin->add_hooks();
 
-	$rating_admin = new Rating\Admin( $rating );
+	$rating_admin = new Rating\Admin( $ratings );
 	$rating_admin->add_hooks();
 }
