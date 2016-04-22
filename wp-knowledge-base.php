@@ -38,8 +38,9 @@ define( 'WPKB_FILE', __FILE__ );
 define( 'WPKB_VERSION', '1.2' );
 
 // load composer autoloader
-require __DIR__ . '/vendor/autoload.php';
-
+if( ! function_exists( 'wpkb' ) ) {
+	require __DIR__ . '/vendor/autoload.php';
+}
 
 // load constants, filters, actions & shortcodes
 require __DIR__ . '/src/default-actions.php';
