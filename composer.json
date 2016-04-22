@@ -1,6 +1,7 @@
 {
     "name": "ibericode/wp-knowledge-base",
     "description": "WordPress powered documentation.",
+    "type": "wordpress-plugin",
     "license": "GPL2",
     "authors": [
         {
@@ -8,11 +9,24 @@
             "email": "dannyvankooten@gmail.com"
         }
     ],
+    "keywords": [
+        "wordpress",
+        "knowledge base",
+        "documentation"
+    ],
+    "support": {
+        "issues": "https://github.com/ibericode/wp-knowledge-base/issues"
+    },
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "composer/installers": "~1.0"
     },
     "autoload": {
-        "classmap": [ "src/" ],
-        "files": [ "src/functions.php" ]
+        "classmap": [
+            "src/"
+        ],
+        "files": [
+            "src/functions.php"
+        ]
     }
 }
