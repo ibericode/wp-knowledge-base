@@ -31,12 +31,13 @@ class Callouts {
 	 * @return bool
 	 */
 	public function css() {
+		global $post;
 
 		if( ! is_singular( 'wpkb-article' ) ) {
 			return false;
 		}
 
-		if( ! has_shortcode( get_the_content(), self::SHORTCODE ) ) {
+		if( ! has_shortcode( $post->post_content, self::SHORTCODE ) ) {
 			return false;
 		}
 
@@ -107,7 +108,7 @@ class Callouts {
 			<script type="text/javascript">
 				QTags.addButton( 'wpkb_callout', 'KB: Callout', '[wpkb_callout type="info"]', '[/wpkb_callout]', 'kbca', 'Callout', 100 );
 			</script>
-		<?php
+			<?php
 		}
 
 		return true;
