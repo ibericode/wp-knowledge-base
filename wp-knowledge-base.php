@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: WP Knowledge Base
-Version: 1.2
+Version: 1.2.1
 Plugin URI: https://mc4wp.com/kb/
 Description: WordPress powered documentation for your products. Beautiful.
 Author: Danny van Kooten
@@ -11,7 +11,7 @@ Domain Path: /languages/
 License: GPL v3
 
 WP Knowledge Base plugin
-Copyright (C) 2014-2015, Danny van Kooten - support@dannyvankooten.com
+Copyright (C) 2014-2017, Danny van Kooten - support@dannyvankooten.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ if( ! defined( 'ABSPATH' ) ) {
 
 // define version
 define( 'WPKB_FILE', __FILE__ );
-define( 'WPKB_VERSION', '1.2' );
+define( 'WPKB_VERSION', '1.2.1' );
 
 // load composer autoloader
 if( ! function_exists( 'wpkb' ) ) {
