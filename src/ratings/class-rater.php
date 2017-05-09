@@ -245,7 +245,7 @@ class Rater {
 		$html = '<form method="POST" class="wpkb-rating">';
 
 		// Rating options
-		$html .= '<p>';
+		$html .= '<p class="wpkb-rating-options">';
 		$html .= __( 'Was this article helpful?', 'wp-knowledge-base' );
 		$html .= ' ';
 		$html .= sprintf( '<label><input type="radio" name="rating" class="wpkb-rating-option wpkb-rating-5" value="%d">%s</label>', 5, esc_html__( 'Yes' ) );
@@ -278,7 +278,7 @@ class Rater {
 	 */
 	public function print_styles() {
 		echo '<style type="text/css">';
-		echo '.wpkb-rating label { display: inline-block; margin-left: 5px; cursor: pointer; }';
+		echo '.wpkb-rating-options label { display: inline-block; margin-left: 5px; cursor: pointer; }';
 		echo '</style>';
 	}
 
