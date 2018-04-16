@@ -12,7 +12,8 @@ class Article_List {
 		'keyword' => '',
 		'title' => '',
 		'css_classes' => '',
-		'exclude' => ''
+		'exclude' => '',
+		'number' => 6,
 	);
 
 	/**
@@ -85,13 +86,13 @@ class Article_List {
 			$css_classes .= ' wpkb-list-keyword-' . sanitize_title( $args['keyword'] );
 		}
 
-		// start building output string
-		$output = '<div class="wpkb-list ' . esc_attr( ltrim( $css_classes ) ) . '">';
-		$output .= '<h3 class="wpkb-list-title">' . esc_html( $title ) . '</h3>';
-
 		// query docs
 		$query = new \WP_Query( $query_args );
 		$posts = $query->get_posts();
+
+		// start building output string
+		$output = '<div class="wpkb-list ' . esc_attr( ltrim( $css_classes ) ) . '">';
+		$output .= '<h3 class="wpkb-list-title">' . esc_html( $title ) . ' <small> ' . sprintf( __( '(%d articles)', 'wp-knowledge-base' ), count( $posts ) ) . '</small></h3>';
 
 		$output .= '<div class="wpkb-list-content">';
 
@@ -100,7 +101,7 @@ class Article_List {
 			$output .= '<ul>';
 			$odd = false;
 
-			foreach( $posts as $post ) {
+			foreach( $posts as $i => $post ) {
 				$odd = ! $odd;
 
 				// build string of css classes for this list element
@@ -109,6 +110,14 @@ class Article_List {
 
 				// build html for list item
 				$output .= '<li class="' . $css_classes . '"><a href="'. get_permalink( $post ) .'">' . get_the_title( $post ) . '</a></li>';
+				
+
+				// stop after 6 posts, but show "view all" link if there are more.
+				if( $i >= $args['number'] && count( $posts ) > $args['number'] && isset( $term ) ) {
+					$output .= '<li class="wpkb-list-more-link"><a href="'. get_term_link($term ) .'">' . __( 'View all', 'wp-knowledge-base' ) . '</a></li>';
+					
+					break;
+				}
 			}
 
 			$output .= '</ul>';
