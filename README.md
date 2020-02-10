@@ -3,10 +3,6 @@ WP Knowledge Base
 
 WordPress powered knowledge base for your products. Beautiful.
 
-**Requires PHP 5.3+**
-
-_This plugin is under active development and could be subject to changes breaking backward compatibility._
-
 # Usage
 
 This plugin provides you with a custom post type, some taxonomies and other useful tools for building a knowledge base of documentation articles.
